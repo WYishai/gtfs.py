@@ -1,4 +1,5 @@
 import transit_data
+from utils.time import parse_timedelta
 
 
 class StopTime:
@@ -9,14 +10,14 @@ class StopTime:
         """
 
         self.trip = transit_data.trips[trip_id]
-        self.arrival_time = arrival_time
-        self.departure_time = departure_time
-        self.stop = transit_data.stops[stop_id]
-        self.stop_sequence = stop_sequence
+        self.arrival_time = parse_timedelta(arrival_time)
+        self.departure_time = parse_timedelta(departure_time)
+        self.stop = transit_data.stops[int(stop_id)]
+        self.stop_sequence = int(stop_sequence)
+        self.pickup_type = True if pickup_type == '' else not bool(int(pickup_type))
+        self.drop_off_type = True if drop_off_type == '' else not bool(int(drop_off_type))
+        self.shape_dist_traveled = 0 if shape_dist_traveled == '' else float(shape_dist_traveled)
         self.stop_headsign = stop_headsign
-        self.pickup_type = pickup_type
-        self.drop_off_type = drop_off_type
-        self.shape_dist_traveled = shape_dist_traveled
         self.timepoint = timepoint
 
         assert len(kwargs) == 0

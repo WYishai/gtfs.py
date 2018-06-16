@@ -8,7 +8,7 @@ class Route:
         :type transit_data: transit_data.TransitData
         :type route_id: str
         :type route_long_name: str
-        :type route_type: str
+        :type route_type: str | int
         :type agency_id: str | int
         :type route_color: str
         :type route_desc: str
@@ -17,8 +17,9 @@ class Route:
 
         self.route_id = route_id
         self.route_long_name = route_long_name
-        self.route_type = route_type
+        self.route_type = int(route_type)
         self.agency = transit_data.agencies[int(agency_id)]
+        # TODO: find type for the route color
         self.route_color = route_color
         self.route_desc = route_desc
         self.route_short_name = route_short_name

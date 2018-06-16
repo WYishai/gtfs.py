@@ -17,7 +17,7 @@ class LinesFactory:
         agency_id = route.agency.agency_id
 
         if line_number not in self.lines[agency_id]:
-            line = Line(agency_id, line_number)
+            line = Line(route.agency, line_number)
             self.lines[agency_id][line_number] = line
         else:
             line = self.lines[agency_id][line_number]

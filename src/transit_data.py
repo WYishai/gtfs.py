@@ -42,7 +42,7 @@ class TransitData:
             with zip_file.open("stops.txt", "r") as stops_file:
                 reader = csv.DictReader(stops_file)
                 self.stops = {stop.stop_id: stop for stop in
-                              (Stop(**row) for row in reader)}
+                              (Stop(transit_data=self, **row) for row in reader)}
 
             with zip_file.open("stop_times.txt", "r") as stop_times_file:
                 reader = csv.DictReader(stop_times_file)
