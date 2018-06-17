@@ -12,7 +12,7 @@ class Service:
         self.thursday = bool(int(thursday))
         self.friday = bool(int(friday))
         self.saturday = bool(int(saturday))
-        self.start_date = datetime.strptime(start_date, "%Y%m%d").date()
-        self.end_date = datetime.strptime(end_date, "%Y%m%d").date()
+        self.start_date = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, "%Y%m%d").date()
+        self.end_date = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, "%Y%m%d").date()
 
         assert len(kwargs) == 0

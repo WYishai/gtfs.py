@@ -24,7 +24,7 @@ class Route:
         self.route_desc = route_desc
         self.route_short_name = route_short_name
 
-        self.line = transit_data._lines_factory.get_line(self)
+        self.line = self.agency.get_line(self)
         self.trips = []
 
         assert len(kwargs) == 0
