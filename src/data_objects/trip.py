@@ -23,3 +23,15 @@ class Trip:
         self.stop_times = []
 
         assert len(kwargs) == 0
+
+    @property
+    def stops(self):
+        return [stop_time.stop for stop_time in self.stop_times]
+
+    @property
+    def first_stop(self):
+        return self.stops[0]
+
+    @property
+    def last_stop(self):
+        return self.stops[-1]
