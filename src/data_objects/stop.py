@@ -15,7 +15,7 @@ class Stop:
         self.stop_lat = float(stop_lat)
         self.stop_lon = float(stop_lon)
         self.is_central_station = bool(int(location_type))
-        self.parent_station = parent_station
+        self.parent_station = None if parent_station == '' else int(parent_station)
         # self.parent_station = None if parent_station == '' else transit_data.stops[parent_station]
         self.zone_id = None if zone_id == '' else int(zone_id)
 
