@@ -28,3 +28,15 @@ class Route:
         self.trips = []
 
         assert len(kwargs) == 0
+
+    @property
+    def stops(self):
+        return None if len(self.trips) == 0 else self.trips[0].stops
+
+    @property
+    def first_stop(self):
+        return None if len(self.trips) == 0 else self.trips[0].first_stop
+
+    @property
+    def last_stop(self):
+        return None if len(self.trips) == 0 else self.trips[0].last_stop
