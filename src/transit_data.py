@@ -5,7 +5,7 @@ from data_objects import *
 
 
 class TransitData:
-    def __init__(self, file_path):
+    def __init__(self, gtfs_file=None):
         self.agencies = {}
         self.routes = {}
         self.shapes = {}
@@ -16,7 +16,8 @@ class TransitData:
         self.has_changed = False
         self.is_verified = False
 
-        self.load_gtfs_file(file_path)
+        if gtfs_file is not None:
+            self.load_gtfs_file(gtfs_file)
 
     def _changed(self):
         self.has_changed = True
