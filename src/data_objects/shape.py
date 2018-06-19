@@ -35,6 +35,8 @@ class ShapeCollection(BaseGtfsObjectCollection):
     def add_agency(self, **kwargs):
         shape = Shape(**kwargs)
 
+        self._transit_data._changed()
+
         assert shape.shape_id not in self._objects
         self._objects[shape.shape_id] = shape
         return shape

@@ -54,6 +54,8 @@ class StopCollection(BaseGtfsObjectCollection):
     def add_agency(self, **kwargs):
         stop = Stop(transit_data=self._transit_data, **kwargs)
 
+        self._transit_data._changed()
+
         assert stop.stop_id not in self._objects
         self._objects[stop.stop_id] = stop
         return stop

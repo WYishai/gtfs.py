@@ -46,6 +46,8 @@ class AgencyCollection(BaseGtfsObjectCollection):
     def add_agency(self, **kwargs):
         agency = Agency(transit_data=self._transit_data, **kwargs)
 
+        self._transit_data._changed()
+
         assert agency.agency_id not in self._objects
         self._objects[agency.agency_id] = agency
         return agency

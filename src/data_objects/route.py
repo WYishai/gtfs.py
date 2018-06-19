@@ -61,6 +61,8 @@ class RouteCollection(BaseGtfsObjectCollection):
     def add_route(self, **kwargs):
         route = Route(transit_data=self._transit_data, **kwargs)
 
+        self._transit_data._changed()
+
         assert route.route_id not in self._objects
         self._objects[route.route_id] = route
         return route

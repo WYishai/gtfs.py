@@ -45,6 +45,8 @@ class ServiceCollection(BaseGtfsObjectCollection):
     def add_service(self, **kwargs):
         service = Service(**kwargs)
 
+        self._transit_data._changed()
+
         assert service.service_id not in self._objects
         self._objects[service.service_id] = service
         return service

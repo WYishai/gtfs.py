@@ -64,6 +64,8 @@ class TripCollection(BaseGtfsObjectCollection):
     def add_agency(self, **kwargs):
         trip = Trip(transit_data=self._transit_data, **kwargs)
 
+        self._transit_data._changed()
+
         assert trip.trip_id not in self._objects
         self._objects[trip.trip_id] = trip
         trip.route.trips.append(trip)

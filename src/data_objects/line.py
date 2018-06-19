@@ -27,6 +27,8 @@ class LineCollection(BaseGtfsObjectCollection):
     def get_line(self, route):
         line_number = route.route_short_name
 
+        self._transit_data._changed()
+
         if line_number not in self:
             line = data_objects.line.Line(self._agency, line_number)
             self._objects[line_number] = line
