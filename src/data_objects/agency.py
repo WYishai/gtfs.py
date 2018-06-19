@@ -1,16 +1,29 @@
 import data_objects.line
+from utils.parsing import parse_or_default
 
 
 class Agency:
-    def __init__(self, agency_id, agency_name, agency_url, agency_timezone, agency_lang, agency_phone, agency_fare_url,
-                 **kwargs):
+    def __init__(self, agency_id, agency_name, agency_url, agency_timezone, agency_lang=None, agency_phone=None,
+                 agency_email=None, agency_fare_url=None, **kwargs):
+        """
+        :type agency_id: str | int
+        :type agency_name: str
+        :type agency_url: str
+        :type agency_timezone: str
+        :type agency_lang: str | None
+        :type agency_phone: str | None
+        :type agency_email: str | None
+        :type agency_fare_url: str | None
+        """
+
         self.agency_id = int(agency_id)
         self.agency_name = agency_name
         self.agency_url = agency_url
         self.agency_timezone = agency_timezone
-        self.agency_lang = agency_lang
-        self.agency_phone = agency_phone
-        self.agency_fare_url = agency_fare_url
+        self.agency_lang = parse_or_default(agency_lang, None, str)
+        self.agency_phone = parse_or_default(agency_phone, None, str)
+        self.agency_email = parse_or_default(agency_email, None, str)
+        self.agency_fare_url = parse_or_default(agency_fare_url, None, str)
 
         self.lines = {}
 

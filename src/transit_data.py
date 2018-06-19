@@ -73,11 +73,8 @@ class TransitData:
                 stop_time.trip.stop_times.append(stop_time)
                 stop_time.stop.stop_times.append(stop_time)
 
-    def add_agency(self, agency_id, agency_name, agency_url, agency_timezone, agency_lang, agency_phone,
-                   agency_fare_url, **kwargs):
-        agency = Agency(agency_id=agency_id, agency_name=agency_name, agency_url=agency_url,
-                        agency_timezone=agency_timezone, agency_lang=agency_lang, agency_phone=agency_phone,
-                        agency_fare_url=agency_fare_url, **kwargs)
+    def add_agency(self, **kwargs):
+        agency = Agency(**kwargs)
 
         # TODO: merge this to code line to one function
         assert agency.agency_id not in self.agencies
@@ -85,40 +82,32 @@ class TransitData:
         self.agencies[agency.agency_id] = agency
         return agency
 
-    def add_route(self, route_id, route_long_name, route_type, agency_id, route_color, route_desc, route_short_name,
-                  **kwargs):
-        route = Route(transit_data=self, route_id=route_id, route_long_name=route_long_name, route_type=route_type,
-                      agency_id=agency_id, route_color=route_color, route_desc=route_desc,
-                      route_short_name=route_short_name, **kwargs)
+    def add_route(self, **kwargs):
+        route = Route(transit_data=self, **kwargs)
 
         assert route.route_id not in self.routes
         self._changed()
         self.routes[route.route_id] = route
         return route
 
-    def add_shape(self, shape_id, shape_pt_lat, shape_pt_lon, shape_pt_sequence, shape_dist_traveled=None, **kwargs):
-        shape = Shape(shape_id=shape_id, shape_pt_lat=shape_pt_lat, shape_pt_lon=shape_pt_lon,
-                      shape_pt_sequence=shape_pt_sequence, shape_dist_traveled=shape_dist_traveled, **kwargs)
+    def add_shape(self, **kwargs):
+        shape = Shape(**kwargs)
 
         assert shape.shape_id not in self.shapes
         self._changed()
         self.shapes[shape.shape_id] = shape
         return shape
 
-    def add_service(self, service_id, sunday, monday, tuesday, wednesday, thursday, friday, saturday, start_date,
-                    end_date, **kwargs):
-        service = Service(service_id=service_id, sunday=sunday, monday=monday, tuesday=tuesday, wednesday=wednesday,
-                          thursday=thursday, friday=friday, saturday=saturday, start_date=start_date, end_date=end_date,
-                          **kwargs)
+    def add_service(self, **kwargs):
+        service = Service(**kwargs)
 
         assert service.service_id not in self.calendar
         self._changed()
         self.calendar[service.service_id] = service
         return service
 
-    def add_trip(self, trip_id, route_id, service_id, trip_headsign, direction_id, shape_id, **kwargs):
-        trip = Trip(trip_id=trip_id, route_id=route_id, service_id=service_id, trip_headsign=trip_headsign,
-                    direction_id=direction_id, shape_id=shape_id, **kwargs)
+    def add_trip(self, **kwargs):
+        trip = Trip(transit_data=self, **kwargs)
 
         assert trip.trip_id not in self.trips
         self._changed()
@@ -126,24 +115,16 @@ class TransitData:
         trip.route.trips.append(trip)
         return trip
 
-    def add_stop(self, stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, location_type, parent_station,
-                 zone_id, **kwargs):
-        stop = Stop(transit_data=self, stop_id=stop_id, stop_code=stop_code, stop_name=stop_name, stop_desc=stop_desc,
-                    stop_lat=stop_lat, stop_lon=stop_lon, location_type=location_type, parent_station=parent_station,
-                    zone_id=zone_id, **kwargs)
+    def add_stop(self, **kwargs):
+        stop = Stop(transit_data=self, **kwargs)
 
         assert stop.stop_id not in self.stops
         self._changed()
         self.stops[stop.stop_id] = stop
         return stop
 
-    def add_stop_time(self, trip_id, arrival_time, departure_time, stop_id, stop_sequence, pickup_type, drop_off_type,
-                      shape_dist_traveled, stop_headsign=None, timepoint=None, **kwargs):
-        stop_time = StopTime(transit_data=self, trip_id=trip_id, arrival_time=arrival_time,
-                             departure_time=departure_time, stop_id=stop_id, stop_sequence=stop_sequence,
-                             pickup_type=pickup_type, drop_off_type=drop_off_type,
-                             shape_dist_traveled=shape_dist_traveled, stop_headsign=stop_headsign, timepoint=timepoint,
-                             **kwargs)
+    def add_stop_time(self, **kwargs):
+        stop_time = StopTime(transit_data=self, **kwargs)
 
         assert stop_time.stop_sequence not in (st.stop_sequence for st in stop_time.trip.stop_times)
         self._changed()
