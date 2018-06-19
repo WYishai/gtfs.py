@@ -5,12 +5,12 @@ from data_objects import *
 
 class TransitData:
     def __init__(self, gtfs_file=None):
-        self.agencies = {}
-        self.routes = {}
-        self.shapes = {}
-        self.calendar = {}
-        self.trips = {}
-        self.stops = {}
+        self.agencies = AgencyCollection(self)
+        self.routes = RouteCollection(self)
+        self.shapes = ShapeCollection(self)
+        self.calendar = ServiceCollection(self)
+        self.trips = TripCollection(self)
+        self.stops = StopCollection(self)
 
         self.has_changed = False
         self.is_verified = False
@@ -35,23 +35,22 @@ class TransitData:
         zip_file = ZipFile(gtfs_file)
 
         with zip_file.open("agency.txt", "r") as agency_file:
-            reader = csv.DictReader(agency_file)
-            self.agencies = AgencyCollection(self, agency_file)
+            self.agencies._load_file(agency_file)
 
         with zip_file.open("routes.txt", "r") as routes_file:
-            self.routes = RouteCollection(self, routes_file)
+            self.routes._load_file(routes_file)
 
         with zip_file.open("shapes.txt", "r") as shapes_file:
-            self.shapes = ShapeCollection(self, shapes_file)
+            self.shapes._load_file(shapes_file)
 
         with zip_file.open("calendar.txt", "r") as calendar_file:
-            self.calendar = ServiceCollection(self, calendar_file)
+            self.calendar._load_file(calendar_file)
 
         with zip_file.open("trips.txt", "r") as trips_file:
-            self.trips = TripCollection(self, trips_file)
+            self.trips._load_file(trips_file)
 
         with zip_file.open("stops.txt", "r") as stops_file:
-            self.stops = StopCollection(self, stops_file)
+            self.stops._load_file(stops_file)
 
         with zip_file.open("stop_times.txt", "r") as stop_times_file:
             reader = csv.DictReader(stop_times_file)
@@ -61,54 +60,22 @@ class TransitData:
                 stop_time.stop.stop_times.append(stop_time)
 
     def add_agency(self, **kwargs):
-        agency = Agency(**kwargs)
-
-        # TODO: merge this to code line to one function
-        assert agency.agency_id not in self.agencies
-        self._changed()
-        self.agencies[agency.agency_id] = agency
-        return agency
+        self.agencies.add_agency(**kwargs)
 
     def add_route(self, **kwargs):
-        route = Route(transit_data=self, **kwargs)
-
-        assert route.route_id not in self.routes
-        self._changed()
-        self.routes[route.route_id] = route
-        return route
+        self.routes.add_route(**kwargs)
 
     def add_shape(self, **kwargs):
-        shape = Shape(**kwargs)
-
-        assert shape.shape_id not in self.shapes
-        self._changed()
-        self.shapes[shape.shape_id] = shape
-        return shape
+        self.shapes.add_shape(**kwargs)
 
     def add_service(self, **kwargs):
-        service = Service(**kwargs)
-
-        assert service.service_id not in self.calendar
-        self._changed()
-        self.calendar[service.service_id] = service
-        return service
+        self.calendar.add_service(**kwargs)
 
     def add_trip(self, **kwargs):
-        trip = Trip(transit_data=self, **kwargs)
-
-        assert trip.trip_id not in self.trips
-        self._changed()
-        self.trips[trip.trip_id] = trip
-        trip.route.trips.append(trip)
-        return trip
+        self.trips.add_trip(**kwargs)
 
     def add_stop(self, **kwargs):
-        stop = Stop(transit_data=self, **kwargs)
-
-        assert stop.stop_id not in self.stops
-        self._changed()
-        self.stops[stop.stop_id] = stop
-        return stop
+        self.stops.add_stop(**kwargs)
 
     def add_stop_time(self, **kwargs):
         stop_time = StopTime(transit_data=self, **kwargs)

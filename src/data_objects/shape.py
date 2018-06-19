@@ -32,7 +32,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_agency(self, **kwargs):
+    def add_shape(self, **kwargs):
         shape = Shape(**kwargs)
 
         self._transit_data._changed()

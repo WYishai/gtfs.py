@@ -51,7 +51,7 @@ class StopCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_agency(self, **kwargs):
+    def add_stop(self, **kwargs):
         stop = Stop(transit_data=self._transit_data, **kwargs)
 
         self._transit_data._changed()
