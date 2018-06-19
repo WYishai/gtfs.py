@@ -1,10 +1,13 @@
-import data_objects.line
+import csv
+
+from data_objects.base_object import BaseGtfsObjectCollection
+from data_objects.line import LineCollection
 from utils.parsing import parse_or_default
 
 
 class Agency:
-    def __init__(self, agency_id, agency_name, agency_url, agency_timezone, agency_lang=None, agency_phone=None,
-                 agency_email=None, agency_fare_url=None, **kwargs):
+    def __init__(self, transit_data, agency_id, agency_name, agency_url, agency_timezone, agency_lang=None,
+                 agency_phone=None, agency_email=None, agency_fare_url=None, **kwargs):
         """
         :type agency_id: str | int
         :type agency_name: str
@@ -25,19 +28,33 @@ class Agency:
         self.agency_email = parse_or_default(agency_email, None, str)
         self.agency_fare_url = parse_or_default(agency_fare_url, None, str)
 
-        self.lines = {}
+        self.lines = LineCollection(transit_data, self)
 
         assert len(kwargs) == 0
 
     def get_line(self, route):
-        line_number = route.route_short_name
+        return self.lines.get_line(route)
 
-        if line_number not in self.lines:
-            line = data_objects.line.Line(self, line_number)
-            self.lines[line_number] = line
+
+class AgencyCollection(BaseGtfsObjectCollection):
+    def __init__(self, transit_data, csv_file=None):
+        BaseGtfsObjectCollection.__init__(self, transit_data)
+
+        if csv_file is not None:
+            self._load_file(csv_file)
+
+    def add_agency(self, **kwargs):
+        agency = Agency(transit_data=self._transit_data, **kwargs)
+
+        assert agency.agency_id not in self._objects
+        self._objects[agency.agency_id] = agency
+        return agency
+
+    def _load_file(self, csv_file):
+        if isinstance(csv_file, str):
+            with open(csv_file, "rb") as f:
+                self._load_file(f)
         else:
-            line = self.lines[line_number]
-
-        line.add_route(route)
-
-        return line
+            reader = csv.DictReader(csv_file)
+            self._objects = {agency.agency_id: agency for agency in
+                             (Agency(transit_data=self._transit_data, **row) for row in reader)}

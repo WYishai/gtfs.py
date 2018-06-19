@@ -1,4 +1,7 @@
+import csv
+
 import transit_data
+from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default, str_to_bool
 
 
@@ -39,3 +42,27 @@ class Stop:
         self.stop_times = []
 
         assert len(kwargs) == 0
+
+
+class StopCollection(BaseGtfsObjectCollection):
+    def __init__(self, transit_data, csv_file=None):
+        BaseGtfsObjectCollection.__init__(self, transit_data)
+
+        if csv_file is not None:
+            self._load_file(csv_file)
+
+    def add_agency(self, **kwargs):
+        stop = Stop(transit_data=self._transit_data, **kwargs)
+
+        assert stop.stop_id not in self._objects
+        self._objects[stop.stop_id] = stop
+        return stop
+
+    def _load_file(self, csv_file):
+        if isinstance(csv_file, str):
+            with open(csv_file, "rb") as f:
+                self._load_file(f)
+        else:
+            reader = csv.DictReader(csv_file)
+            self._objects = {stop.stop_id: stop for stop in
+                             (Stop(transit_data=self._transit_data, **row) for row in reader)}

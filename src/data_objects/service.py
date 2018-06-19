@@ -1,5 +1,7 @@
+import csv
 from datetime import datetime
 
+from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default, str_to_bool
 
 
@@ -31,3 +33,27 @@ class Service:
         self.saturday = parse_or_default(saturday, False, str_to_bool)
 
         assert len(kwargs) == 0
+
+
+class ServiceCollection(BaseGtfsObjectCollection):
+    def __init__(self, transit_data, csv_file=None):
+        BaseGtfsObjectCollection.__init__(self, transit_data)
+
+        if csv_file is not None:
+            self._load_file(csv_file)
+
+    def add_service(self, **kwargs):
+        service = Service(**kwargs)
+
+        assert service.service_id not in self._objects
+        self._objects[service.service_id] = service
+        return service
+
+    def _load_file(self, csv_file):
+        if isinstance(csv_file, str):
+            with open(csv_file, "rb") as f:
+                self._load_file(f)
+        else:
+            reader = csv.DictReader(csv_file)
+            self._objects = {service.service_id: service for service in
+                             (Service(**row) for row in reader)}

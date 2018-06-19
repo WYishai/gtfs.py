@@ -1,3 +1,6 @@
+import csv
+
+from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default
 
 
@@ -20,3 +23,27 @@ class Shape:
         self.shape_dist_traveled = parse_or_default(shape_dist_traveled, None, float)
 
         assert len(kwargs) == 0
+
+
+class ShapeCollection(BaseGtfsObjectCollection):
+    def __init__(self, transit_data, csv_file=None):
+        BaseGtfsObjectCollection.__init__(self, transit_data)
+
+        if csv_file is not None:
+            self._load_file(csv_file)
+
+    def add_agency(self, **kwargs):
+        shape = Shape(**kwargs)
+
+        assert shape.shape_id not in self._objects
+        self._objects[shape.shape_id] = shape
+        return shape
+
+    def _load_file(self, csv_file):
+        if isinstance(csv_file, str):
+            with open(csv_file, "rb") as f:
+                self._load_file(f)
+        else:
+            reader = csv.DictReader(csv_file)
+            self._objects = {shape.shape_id: shape for shape in
+                             (Shape(**row) for row in reader)}
