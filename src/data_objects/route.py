@@ -50,6 +50,16 @@ class Route:
     def last_stop(self):
         return None if len(self.trips) == 0 else self.trips[0].last_stop
 
+    def get_trips_calendar(self, from_date, to_date=None, stop_id=None, sort=True):
+        res = []
+        for trip in self.trips:
+            for t in trip.get_trip_calendar(from_date, to_date=to_date, stop_id=stop_id):
+                res.append((t, trip))
+        if sort:
+            res.sort()
+
+        return res
+
     def get_csv_fields(self):
         return ["route_id", "route_short_name", "route_long_name", "route_type", "agency_id", "route_desc",
                 "route_color", "route_text_color", "bikes_allowed"]

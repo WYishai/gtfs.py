@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime, date, time, timedelta
 
 import data_objects.shape
 import transit_data
@@ -42,6 +43,13 @@ class Trip:
         assert len(kwargs) == 0
 
     @property
+    def start_time(self):
+        arrival_time_seconds = self.stop_times[0].arrival_time.total_seconds()
+        return time(hour=int(arrival_time_seconds / (60 * 60)),
+                    minute=int(arrival_time_seconds / 60) % 60,
+                    second=int(arrival_time_seconds) % 60)
+
+    @property
     def stops(self):
         return [stop_time.stop for stop_time in self.stop_times]
 
@@ -52,6 +60,34 @@ class Trip:
     @property
     def last_stop(self):
         return self.stops[-1]
+
+    def get_trip_calendar(self, from_date, to_date=None, stop_id=None):
+        """
+        :type from_date: date
+        :type to_date: date | None
+        :type stop_id: int
+        """
+
+        from_date = datetime.combine(from_date, time())
+        if to_date is None:
+            to_date = from_date
+        else:
+            to_date = datetime.combine(to_date, time())
+
+        assert from_date <= to_date
+
+        stop_time = None
+        if stop_id is None:
+            stop_time = self.stop_times[0]
+        else:
+            stop_time = (st for st in self.stop_times if st.stop.stop_id == stop_id).next()
+
+        i = from_date
+        day_interval = timedelta(days=1)
+        while i <= to_date:
+            if self.service.is_active_on(i):
+                yield i + stop_time.arrival_time
+            i += day_interval
 
     def get_csv_fields(self):
         return ["trip_id", "route_id", "service_id", "trip_headsign", "trip_short_name", "direction_id", "block_id",

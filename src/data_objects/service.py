@@ -31,8 +31,13 @@ class Service:
         self.thursday = parse_or_default(thursday, False, str_to_bool)
         self.friday = parse_or_default(friday, False, str_to_bool)
         self.saturday = parse_or_default(saturday, False, str_to_bool)
+        self.days_relevance = [self.sunday, self.monday, self.tuesday, self.wednesday, self.thursday, self.friday,
+                               self.saturday]
 
         assert len(kwargs) == 0
+
+    def is_active_on(self, date):
+        return self.days_relevance[date.isoweekday() % 7]
 
     def get_csv_fields(self):
         return ["service_id", "start_date", "end_date", "sunday", "monday", "tuesday", "wednesday", "thursday",
