@@ -1,3 +1,6 @@
+import os
+import zipfile
+from cStringIO import StringIO
 from zipfile import ZipFile
 
 from data_objects import *
@@ -58,6 +61,53 @@ class TransitData:
                 stop_time = StopTime(transit_data=self, **row)
                 stop_time.trip.stop_times.append(stop_time)
                 stop_time.stop.stop_times.append(stop_time)
+
+    def save(self, file_path, compression=zipfile.ZIP_DEFLATED):
+        assert not os.path.exists(file_path)
+
+        with ZipFile(file_path, mode="w", compression=compression) as zip_file:
+            dome_file = StringIO()
+            self.agencies.save(dome_file)
+            zip_file.writestr("agency.txt", dome_file.getvalue())
+            dome_file.close()
+
+            dome_file = StringIO()
+            self.routes.save(dome_file)
+            zip_file.writestr("routes.txt", dome_file.getvalue())
+            dome_file.close()
+
+            dome_file = StringIO()
+            self.shapes.save(dome_file)
+            zip_file.writestr("shapes.txt", dome_file.getvalue())
+            dome_file.close()
+
+            dome_file = StringIO()
+            self.calendar.save(dome_file)
+            zip_file.writestr("calendar.txt", dome_file.getvalue())
+            dome_file.close()
+
+            dome_file = StringIO()
+            self.trips.save(dome_file)
+            zip_file.writestr("trips.txt", dome_file.getvalue())
+            dome_file.close()
+
+            dome_file = StringIO()
+            self.stops.save(dome_file)
+            zip_file.writestr("stops.txt", dome_file.getvalue())
+            dome_file.close()
+
+            fields = []
+            for trip in self.trips:
+                for stop_time in trip.stop_times:
+                    fields += (field for field in stop_time.get_csv_fields() if field not in fields)
+            dome_file = StringIO()
+            writer = csv.DictWriter(dome_file, fieldnames=fields, restval=None)
+            writer.writeheader()
+            for trip in self.trips:
+                for stop_time in trip.stop_times:
+                    writer.writerow(stop_time.to_csv_line())
+            zip_file.writestr("stop_times.txt", dome_file.getvalue())
+            dome_file.close()
 
     def add_agency(self, **kwargs):
         self.agencies.add_agency(**kwargs)

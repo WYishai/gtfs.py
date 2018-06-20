@@ -1,3 +1,4 @@
+import csv
 import sys
 
 
@@ -5,6 +6,19 @@ class BaseGtfsObjectCollection(object):
     def __init__(self, transit_data):
         self._transit_data = transit_data
         self._objects = {}
+
+    def save(self, csv_file):
+        if isinstance(csv_file, str):
+            with open(csv_file, "wb") as f:
+                self.save(f)
+        else:
+            fields = []
+            for obj in self:
+                fields += (field for field in obj.get_csv_fields() if field not in fields)
+
+            writer = csv.DictWriter(csv_file, fieldnames=fields, restval=None)
+            writer.writeheader()
+            writer.writerows(obj.to_csv_line() for obj in self)
 
     def __len__(self):
         return len(self._objects)

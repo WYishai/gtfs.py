@@ -27,10 +27,26 @@ class StopTime:
         self.departure_time = parse_timedelta(departure_time)
         self.stop = transit_data.stops[int(stop_id)]
         self.stop_sequence = int(stop_sequence)
-        self.pickup_type = parse_or_default(pickup_type, True, lambda v: not bool(int(v)))
-        self.drop_off_type = parse_or_default(drop_off_type, True, lambda v: not bool(int(v)))
+        self.allow_pickup = parse_or_default(pickup_type, True, lambda v: not bool(int(v)))
+        self.allow_drop_off = parse_or_default(drop_off_type, True, lambda v: not bool(int(v)))
         self.shape_dist_traveled = parse_or_default(shape_dist_traveled, 0.0, float)
         self.stop_headsign = stop_headsign
         self.timepoint = parse_or_default(timepoint, None, int)
 
         assert len(kwargs) == 0
+
+    def get_csv_fields(self):
+        return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "pickup_type", "drop_off_type",
+                "shape_dist_traveled", "stop_headsign", "timepoint"]
+
+    def to_csv_line(self):
+        return {"trip_id": self.trip.trip_id,
+                "arrival_time": self.arrival_time,
+                "departure_time": self.departure_time,
+                "stop_id": self.stop.stop_id,
+                "stop_sequence": self.stop_sequence,
+                "pickup_type": 0 if self.allow_pickup else 1,
+                "drop_off_type": 0 if self.allow_drop_off else 1,
+                "shape_dist_traveled": self.shape_dist_traveled,
+                "stop_headsign": self.stop_headsign,
+                "timepoint": self.timepoint}

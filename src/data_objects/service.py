@@ -34,6 +34,22 @@ class Service:
 
         assert len(kwargs) == 0
 
+    def get_csv_fields(self):
+        return ["service_id", "start_date", "end_date", "sunday", "monday", "tuesday", "wednesday", "thursday",
+                "friday", "saturday"]
+
+    def to_csv_line(self):
+        return {"service_id": self.service_id,
+                "start_date": self.start_date.strftime("%Y%m%d"),
+                "end_date": self.end_date.strftime("%Y%m%d"),
+                "sunday": 1 if self.sunday else 0,
+                "monday": 1 if self.monday else 0,
+                "tuesday": 1 if self.tuesday else 0,
+                "wednesday": 1 if self.wednesday else 0,
+                "thursday": 1 if self.thursday else 0,
+                "friday": 1 if self.friday else 0,
+                "saturday": 1 if self.saturday else 0}
+
 
 class ServiceCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

@@ -43,6 +43,24 @@ class Stop:
 
         assert len(kwargs) == 0
 
+    def get_csv_fields(self):
+        return ["stop_id", "stop_name", "stop_lat", "stop_lon", "stop_code", "stop_desc", "zone_id", "stop_url",
+                "location_type", "parent_station", "stop_timezone", "wheelchair_boarding"]
+
+    def to_csv_line(self):
+        return {"stop_id": self.stop_id,
+                "stop_name": self.stop_name,
+                "stop_lat": self.stop_lat,
+                "stop_lon": self.stop_lon,
+                "stop_code": self.stop_code,
+                "stop_desc": self.stop_desc,
+                "zone_id": self.zone_id,
+                "stop_url": self.stop_url,
+                "location_type": 1 if self.is_central_station else 0,
+                "parent_station": self.parent_station,
+                "stop_timezone": self.stop_timezone,
+                "wheelchair_boarding": self.wheelchair_boarding}
+
 
 class StopCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

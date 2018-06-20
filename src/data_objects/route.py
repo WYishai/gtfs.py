@@ -50,6 +50,21 @@ class Route:
     def last_stop(self):
         return None if len(self.trips) == 0 else self.trips[0].last_stop
 
+    def get_csv_fields(self):
+        return ["route_id", "route_short_name", "route_long_name", "route_type", "agency_id", "route_desc",
+                "route_color", "route_text_color", "bikes_allowed"]
+
+    def to_csv_line(self):
+        return {"route_id": self.route_id,
+                "route_short_name": self.route_short_name,
+                "route_long_name": self.route_long_name,
+                "route_type": self.route_type,
+                "agency_id": self.agency.agency_id,
+                "route_desc": self.route_desc,
+                "route_color": self.route_color,
+                "route_text_color": self.route_text_color,
+                "bikes_allowed": 1 if self.bikes_allowed else 0}
+
 
 class RouteCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

@@ -24,6 +24,16 @@ class Shape:
 
         assert len(kwargs) == 0
 
+    def get_csv_fields(self):
+        return ["shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"]
+
+    def to_csv_line(self):
+        return {"shape_id": self.shape_id,
+                "shape_pt_lat": self.shape_pt_lat,
+                "shape_pt_lon": self.shape_pt_lon,
+                "shape_pt_sequence": self.shape_pt_sequence,
+                "shape_dist_traveled": self.shape_dist_traveled}
+
 
 class ShapeCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

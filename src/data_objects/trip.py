@@ -53,6 +53,23 @@ class Trip:
     def last_stop(self):
         return self.stops[-1]
 
+    def get_csv_fields(self):
+        return ["trip_id", "route_id", "service_id", "trip_headsign", "trip_short_name", "direction_id", "block_id",
+                "shape_id", "bikes_allowed", "wheelchair_accessible", "original_trip_id"]
+
+    def to_csv_line(self):
+        return {"trip_id": self.trip_id,
+                "route_id": self.route.route_id,
+                "service_id": self.service.service_id,
+                "trip_headsign": self.trip_headsign,
+                "trip_short_name": self.trip_short_name,
+                "direction_id": self.direction_id,
+                "block_id": self.block_id,
+                "shape_id": self.shape.shape_id,
+                "bikes_allowed": self.bikes_allowed,
+                "wheelchair_accessible": self.wheelchair_accessible,
+                "original_trip_id": self.original_trip_id}
+
 
 class TripCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

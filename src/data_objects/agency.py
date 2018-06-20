@@ -35,6 +35,20 @@ class Agency:
     def get_line(self, route):
         return self.lines.get_line(route)
 
+    def get_csv_fields(self):
+        return ["agency_id", "agency_name", "agency_url", "agency_timezone", "agency_lang", "agency_phone",
+                "agency_email", "agency_fare_url"]
+
+    def to_csv_line(self):
+        return {"agency_id": self.agency_id,
+                "agency_name": self.agency_name,
+                "agency_url": self.agency_url,
+                "agency_timezone": self.agency_timezone,
+                "agency_lang": self.agency_lang,
+                "agency_phone": self.agency_phone,
+                "agency_email": self.agency_email,
+                "agency_fare_url": self.agency_fare_url}
+
 
 class AgencyCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
