@@ -1,3 +1,5 @@
+import itertools
+
 import data_objects.agency
 from data_objects.base_object import BaseGtfsObjectCollection
 
@@ -17,6 +19,16 @@ class Line:
     def add_route(self, route):
         # TODO: check if the route id exists
         self.routes[route.route_id] = route
+
+    def get_trips_calendar(self, from_date, to_date=None, sort=True):
+        res = itertools.chain.from_iterable(route.get_trips_calendar(from_date, to_date=to_date, sort=False)
+                                            for route in self.routes.itervalues())
+
+        if sort:
+            res = list(res)
+            res.sort()
+
+        return res
 
 
 class LineCollection(BaseGtfsObjectCollection):

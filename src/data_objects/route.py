@@ -51,11 +51,12 @@ class Route:
         return None if len(self.trips) == 0 else self.trips[0].last_stop
 
     def get_trips_calendar(self, from_date, to_date=None, stop_id=None, sort=True):
-        res = []
-        for trip in self.trips:
-            for t in trip.get_trip_calendar(from_date, to_date=to_date, stop_id=stop_id):
-                res.append((t, trip))
+        res = ((t, trip)
+               for trip in self.trips
+               for t in trip.get_trip_calendar(from_date, to_date=to_date, stop_id=stop_id))
+
         if sort:
+            res = list(res)
             res.sort()
 
         return res
