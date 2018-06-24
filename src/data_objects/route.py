@@ -2,7 +2,7 @@ import csv
 
 import transit_data
 from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default, str_to_bool
+from utils.parsing import parse_or_default
 
 
 class Route:
@@ -31,7 +31,8 @@ class Route:
         # TODO: find type for the route color
         self.route_color = parse_or_default(route_color, None, str)
         self.route_text_color = parse_or_default(route_text_color, None, str)
-        self.bikes_allowed = parse_or_default(bikes_allowed, None, str_to_bool)
+        # TODO: create parser for yes-no-unknown: 0 for unknown, 1 for yes, and 2 for no
+        self.bikes_allowed = parse_or_default(bikes_allowed, None, int)
 
         self.line = self.agency.get_line(self)
         self.trips = []
@@ -76,6 +77,15 @@ class Route:
                 "route_text_color": self.route_text_color,
                 "bikes_allowed": 1 if self.bikes_allowed else 0}
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        assert transit_data.agencies[self.agency.agency_id] is self.agency
+        assert self.route_type in xrange(0, 8)
+        assert self.bikes_allowed is None or self.bikes_allowed in xrange(0, 3)
+
 
 class RouteCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
@@ -101,3 +111,8 @@ class RouteCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             self._objects = {route.route_id: route for route in
                              (Route(transit_data=self._transit_data, **row) for row in reader)}
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.route_id
+            obj.validate(self._transit_data)

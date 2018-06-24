@@ -30,7 +30,7 @@ class StopTime:
         self.allow_pickup = parse_or_default(pickup_type, True, lambda v: not bool(int(v)))
         self.allow_drop_off = parse_or_default(drop_off_type, True, lambda v: not bool(int(v)))
         self.shape_dist_traveled = parse_or_default(shape_dist_traveled, 0.0, float)
-        self.stop_headsign = stop_headsign
+        self.stop_headsign = parse_or_default(stop_headsign, None, str)
         self.timepoint = parse_or_default(timepoint, None, int)
 
         assert len(kwargs) == 0
@@ -50,3 +50,15 @@ class StopTime:
                 "shape_dist_traveled": self.shape_dist_traveled,
                 "stop_headsign": self.stop_headsign,
                 "timepoint": self.timepoint}
+
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        assert transit_data.trips[self.trip.trip_id] is self.trip
+        assert transit_data.stops[self.stop.stop_id] is self.stop
+
+        assert self.allow_pickup or self.allow_drop_off
+        assert self.arrival_time is not None or self.departure_time is not None
+        assert self.arrival_time is None or self.departure_time is None or self.arrival_time <= self.departure_time

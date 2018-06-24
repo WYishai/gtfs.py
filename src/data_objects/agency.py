@@ -49,6 +49,13 @@ class Agency:
                 "agency_email": self.agency_email,
                 "agency_fare_url": self.agency_fare_url}
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        self.lines.validate()
+
 
 class AgencyCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
@@ -74,3 +81,8 @@ class AgencyCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             self._objects = {agency.agency_id: agency for agency in
                              (Agency(transit_data=self._transit_data, **row) for row in reader)}
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.agency_id
+            obj.validate(self._transit_data)

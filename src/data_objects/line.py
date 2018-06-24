@@ -30,6 +30,13 @@ class Line:
 
         return res
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        assert transit_data.agencies[self.agency.agency_id] is self.agency
+
 
 class LineCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, agency):
@@ -57,3 +64,8 @@ class LineCollection(BaseGtfsObjectCollection):
         assert line.line_number not in self._objects
         self._objects[line.line_number] = line
         return line
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.line_number
+            obj.validate(self._transit_data)

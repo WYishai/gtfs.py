@@ -24,15 +24,14 @@ class Service:
         self.service_id = int(service_id)
         self.start_date = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, "%Y%m%d").date()
         self.end_date = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, "%Y%m%d").date()
-        self.sunday = parse_or_default(sunday, False, str_to_bool)
-        self.monday = parse_or_default(monday, False, str_to_bool)
-        self.tuesday = parse_or_default(tuesday, False, str_to_bool)
-        self.wednesday = parse_or_default(wednesday, False, str_to_bool)
-        self.thursday = parse_or_default(thursday, False, str_to_bool)
-        self.friday = parse_or_default(friday, False, str_to_bool)
-        self.saturday = parse_or_default(saturday, False, str_to_bool)
-        self.days_relevance = [self.sunday, self.monday, self.tuesday, self.wednesday, self.thursday, self.friday,
-                               self.saturday]
+        sunday = parse_or_default(sunday, False, str_to_bool)
+        monday = parse_or_default(monday, False, str_to_bool)
+        tuesday = parse_or_default(tuesday, False, str_to_bool)
+        wednesday = parse_or_default(wednesday, False, str_to_bool)
+        thursday = parse_or_default(thursday, False, str_to_bool)
+        friday = parse_or_default(friday, False, str_to_bool)
+        saturday = parse_or_default(saturday, False, str_to_bool)
+        self.days_relevance = [sunday, monday, tuesday, wednesday, thursday, friday, saturday]
 
         assert len(kwargs) == 0
 
@@ -47,13 +46,20 @@ class Service:
         return {"service_id": self.service_id,
                 "start_date": self.start_date.strftime("%Y%m%d"),
                 "end_date": self.end_date.strftime("%Y%m%d"),
-                "sunday": 1 if self.sunday else 0,
-                "monday": 1 if self.monday else 0,
-                "tuesday": 1 if self.tuesday else 0,
-                "wednesday": 1 if self.wednesday else 0,
-                "thursday": 1 if self.thursday else 0,
-                "friday": 1 if self.friday else 0,
-                "saturday": 1 if self.saturday else 0}
+                "sunday": 1 if self.days_relevance[0] else 0,
+                "monday": 1 if self.days_relevance[1] else 0,
+                "tuesday": 1 if self.days_relevance[2] else 0,
+                "wednesday": 1 if self.days_relevance[3] else 0,
+                "thursday": 1 if self.days_relevance[4] else 0,
+                "friday": 1 if self.days_relevance[5] else 0,
+                "saturday": 1 if self.days_relevance[6] else 0}
+
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        pass
 
 
 class ServiceCollection(BaseGtfsObjectCollection):
@@ -80,3 +86,8 @@ class ServiceCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             self._objects = {service.service_id: service for service in
                              (Service(**row) for row in reader)}
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.service_id
+            obj.validate(self._transit_data)

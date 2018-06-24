@@ -61,6 +61,14 @@ class Stop:
                 "stop_timezone": self.stop_timezone,
                 "wheelchair_boarding": self.wheelchair_boarding}
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        assert self.parent_station is None or self.parent_station in transit_data.stops
+        assert self.wheelchair_boarding is None or self.wheelchair_boarding in xrange(0, 3)
+
 
 class StopCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
@@ -86,3 +94,8 @@ class StopCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             self._objects = {stop.stop_id: stop for stop in
                              (Stop(transit_data=self._transit_data, **row) for row in reader)}
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.stop_id
+            obj.validate(self._transit_data)

@@ -7,7 +7,7 @@ from data_objects import *
 
 
 class TransitData:
-    def __init__(self, gtfs_file=None):
+    def __init__(self, gtfs_file=None, validate=True):
         self.agencies = AgencyCollection(self)
         self.routes = RouteCollection(self)
         self.shapes = ShapeCollection(self)
@@ -16,24 +16,21 @@ class TransitData:
         self.stops = StopCollection(self)
 
         self.has_changed = False
-        self.is_verified = False
+        self.is_validated = True
 
         if gtfs_file is not None:
-            self.load_gtfs_file(gtfs_file)
+            self.load_gtfs_file(gtfs_file, validate=validate)
 
     def _changed(self):
         self.has_changed = True
-        self.is_verified = False
+        self.is_validated = False
 
-    def load_gtfs_file(self, gtfs_file):
+    def load_gtfs_file(self, gtfs_file, validate=True):
         assert not self.has_changed
 
-        # TODO: replace this check with check if this object is file-like
-        if not isinstance(gtfs_file, file):
+        if isinstance(gtfs_file, str):
             with open(gtfs_file, "rb") as gtfs_real_file:
                 self.load_gtfs_file(gtfs_real_file)
-
-        self._changed()
 
         zip_file = ZipFile(gtfs_file)
 
@@ -62,8 +59,14 @@ class TransitData:
                 stop_time.trip.stop_times.append(stop_time)
                 stop_time.stop.stop_times.append(stop_time)
 
-    def save(self, file_path, compression=zipfile.ZIP_DEFLATED):
+        if validate:
+            self.validate()
+
+    def save(self, file_path, compression=zipfile.ZIP_DEFLATED, validate=True):
         assert not os.path.exists(file_path)
+
+        if validate:
+            self.validate()
 
         with ZipFile(file_path, mode="w", compression=compression) as zip_file:
             dome_file = StringIO()
@@ -136,7 +139,15 @@ class TransitData:
         stop_time.stop.stop_times.append(stop_time)
         return stop_time
 
-    def verify(self):
-        pass
+    def validate(self, force=False):
+        if self.is_validated and not force:
+            return
 
-        self.is_verified = True
+        self.agencies.validate()
+        self.routes.validate()
+        self.shapes.validate()
+        self.calendar.validate()
+        self.trips.validate()
+        self.stops.validate()
+
+        self.is_validated = True

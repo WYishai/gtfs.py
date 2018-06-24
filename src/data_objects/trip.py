@@ -106,6 +106,20 @@ class Trip:
                 "wheelchair_accessible": self.wheelchair_accessible,
                 "original_trip_id": self.original_trip_id}
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        assert transit_data.routes[self.route.route_id] is self.route
+        assert transit_data.calendar[self.service.service_id] is self.service
+        assert self.shape is None or transit_data.shapes[self.shape.shape_id] is self.shape
+        assert self.bikes_allowed is None or self.bikes_allowed in xrange(0, 3)
+        assert self.wheelchair_accessible is None or self.wheelchair_accessible in xrange(0, 3)
+
+        for stop_time in self.stop_times:
+            stop_time.validate(transit_data)
+
 
 class TripCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
@@ -134,3 +148,8 @@ class TripCollection(BaseGtfsObjectCollection):
                              (Trip(transit_data=self._transit_data, **row) for row in reader)}
             for trip in self:
                 trip.route.trips.append(trip)
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.trip_id
+            obj.validate(self._transit_data)

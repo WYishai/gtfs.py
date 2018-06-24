@@ -34,6 +34,13 @@ class Shape:
                 "shape_pt_sequence": self.shape_pt_sequence,
                 "shape_dist_traveled": self.shape_dist_traveled}
 
+    def validate(self, transit_data):
+        """
+        :type transit_data: transit_data.TransitData
+        """
+
+        pass
+
 
 class ShapeCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
@@ -59,3 +66,8 @@ class ShapeCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             self._objects = {shape.shape_id: shape for shape in
                              (Shape(**row) for row in reader)}
+
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.shape_id
+            obj.validate(self._transit_data)
