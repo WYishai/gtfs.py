@@ -31,6 +31,7 @@ class TransitData:
         if isinstance(gtfs_file, str):
             with open(gtfs_file, "rb") as gtfs_real_file:
                 self.load_gtfs_file(gtfs_real_file)
+            return
 
         zip_file = ZipFile(gtfs_file)
 
