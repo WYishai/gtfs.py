@@ -118,8 +118,8 @@ class TransitData:
     def add_route(self, **kwargs):
         self.routes.add_route(**kwargs)
 
-    def add_shape(self, **kwargs):
-        self.shapes.add_shape(**kwargs)
+    def add_shape_point(self, **kwargs):
+        self.shapes.add_shape_point(**kwargs)
 
     def add_service(self, **kwargs):
         self.calendar.add_service(**kwargs)
