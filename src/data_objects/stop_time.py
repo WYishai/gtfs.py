@@ -29,7 +29,7 @@ class StopTime:
         self.stop_sequence = int(stop_sequence)
         self.allow_pickup = parse_or_default(pickup_type, True, lambda v: not bool(int(v)))
         self.allow_drop_off = parse_or_default(drop_off_type, True, lambda v: not bool(int(v)))
-        self.shape_dist_traveled = parse_or_default(shape_dist_traveled, 0.0, float)
+        self.shape_dist_traveled = parse_or_default(shape_dist_traveled, None, float)
         self.stop_headsign = parse_or_default(stop_headsign, None, str)
         self.timepoint = parse_or_default(timepoint, None, int)
 
