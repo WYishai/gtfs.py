@@ -1,4 +1,7 @@
 import csv
+from operator import attrgetter
+
+from sortedcontainers import SortedList
 
 from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default
@@ -29,7 +32,7 @@ class Shape:
 
         self.shape_id = int(shape_id)
 
-        self.shape_points = []
+        self.shape_points = SortedList(key=attrgetter("shape_pt_sequence"))
 
     def get_csv_fields(self):
         return ["shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"]
@@ -68,7 +71,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
             self._objects[shape_id] = shape
         else:
             shape = self[shape_id]
-        shape.shape_points.append(shape_point)
+        shape.shape_points.add(shape_point)
         return shape_point
 
     def _load_file(self, csv_file):

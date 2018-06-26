@@ -1,5 +1,8 @@
 import csv
 from datetime import datetime, date, time, timedelta
+from operator import attrgetter
+
+from sortedcontainers import SortedList
 
 import data_objects.shape
 import transit_data
@@ -38,7 +41,7 @@ class Trip:
         self.wheelchair_accessible = parse_or_default(wheelchair_accessible, None, int)
         self.original_trip_id = parse_or_default(original_trip_id, None, str)
 
-        self.stop_times = []
+        self.stop_times = SortedList(key=attrgetter("stop_sequence"))
 
         assert len(kwargs) == 0
 

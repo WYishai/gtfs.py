@@ -57,7 +57,7 @@ class TransitData:
             reader = csv.DictReader(stop_times_file)
             for row in reader:
                 stop_time = StopTime(transit_data=self, **row)
-                stop_time.trip.stop_times.append(stop_time)
+                stop_time.trip.stop_times.add(stop_time)
                 stop_time.stop.stop_times.append(stop_time)
 
         if validate:
