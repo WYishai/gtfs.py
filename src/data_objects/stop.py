@@ -86,6 +86,32 @@ class StopCollection(BaseGtfsObjectCollection):
         self._objects[stop.stop_id] = stop
         return stop
 
+    def remove(self, stop, recursive=False, clean_after=True):
+        if not isinstance(stop, Stop):
+            stop = self[stop]
+        else:
+            assert self[stop.stop_id] is stop
+
+        if recursive:
+            for stop_time in stop.stop_times:
+                stop_time.trip.stop_times.remove(stop_time)
+        else:
+            assert len(stop.stop_times) == 0
+
+        del self._objects[stop.stop_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for stop in self:
+            if len(stop.stop_times) == 0:
+                to_clean.append(stop)
+
+        for stop in to_clean:
+            del self._objects[stop.stop_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:

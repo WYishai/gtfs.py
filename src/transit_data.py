@@ -134,6 +134,14 @@ class TransitData:
         stop_time.stop.stop_times.append(stop_time)
         return stop_time
 
+    def clean(self):
+        self.trips.clean()
+        self.stops.clean()
+        self.shapes.clean()
+        self.calendar.clean()
+        self.routes.clean()
+        self.agencies.clean()
+
     def validate(self, force=False):
         if self.is_validated and not force:
             return

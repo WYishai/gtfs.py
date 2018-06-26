@@ -78,6 +78,33 @@ class ServiceCollection(BaseGtfsObjectCollection):
         self._objects[service.service_id] = service
         return service
 
+    def remove(self, service, recursive=False, clean_after=True):
+        if not isinstance(service, Service):
+            service = self[service]
+        else:
+            assert self[service.service_id] is service
+
+        if recursive:
+            for trip in self._transit_data.trips:
+                if trip.service is service:
+                    self._transit_data.trips.remove(trip, recursive=True, clean_after=False)
+        else:
+            assert next((trip for trip in self._transit_data.trips if trip.service is service), None) is None
+
+        del self._objects[service.service_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for service in self:
+            if next((trip for trip in self._transit_data.trips if trip.service is service), None) is None:
+                to_clean.append(service)
+
+        for service in to_clean:
+            del self._objects[service.service_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:

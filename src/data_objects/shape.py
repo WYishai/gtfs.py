@@ -74,6 +74,33 @@ class ShapeCollection(BaseGtfsObjectCollection):
         shape.shape_points.add(shape_point)
         return shape_point
 
+    def remove(self, shape, recursive=False, clean_after=True):
+        if not isinstance(shape, Shape):
+            shape = self[shape]
+        else:
+            assert self[shape.shape_id] is shape
+
+        if recursive:
+            for trip in self._transit_data.trips:
+                if trip.shape is shape:
+                    self._transit_data.trips.remove(trip, recursive=True, clean_after=False)
+        else:
+            assert next((trip for trip in self._transit_data.trips if trip.shape is shape), None) is None
+
+        del self._objects[shape.shape_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for shape in self:
+            if next((trip for trip in self._transit_data.trips if trip.shape is shape), None) is None:
+                to_clean.append(shape)
+
+        for shape in to_clean:
+            del self._objects[shape.shape_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:

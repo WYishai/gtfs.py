@@ -103,6 +103,32 @@ class RouteCollection(BaseGtfsObjectCollection):
         self._objects[route.route_id] = route
         return route
 
+    def remove(self, route, recursive=False, clean_after=True):
+        if not isinstance(route, Route):
+            route = self[route]
+        else:
+            assert self[route.route_id] is route
+
+        if recursive:
+            for trip in route.trips:
+                self._transit_data.trips.remove(trip, recursive=True, clean_after=False)
+        else:
+            assert len(route.trips) == 0
+
+        del self._objects[route.route_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for route in self:
+            if next((trip for trip in route.trips), None) is None:
+                to_clean.append(route)
+
+        for route in to_clean:
+            del self._objects[route.route_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:

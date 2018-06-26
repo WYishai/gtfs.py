@@ -73,6 +73,33 @@ class AgencyCollection(BaseGtfsObjectCollection):
         self._objects[agency.agency_id] = agency
         return agency
 
+    def remove(self, agency, recursive=False, clean_after=True):
+        if not isinstance(agency, Agency):
+            agency = self[agency]
+        else:
+            assert self[agency.agency_id] is agency
+
+        if recursive:
+            for line in list(agency.lines):
+                agency.lines.remove(line, recursive=True, clean_after=False)
+        else:
+            for line in agency.lines:
+                assert len(line.routes) == 0
+
+        del self._objects[agency.agency_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for agency in self:
+            if next((route for line in agency.lines for route in line.routes), None) is None:
+                to_clean.append(agency)
+
+        for agency in to_clean:
+            del self._objects[agency.agency_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:

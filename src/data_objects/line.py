@@ -65,6 +65,32 @@ class LineCollection(BaseGtfsObjectCollection):
         self._objects[line.line_number] = line
         return line
 
+    def remove(self, line, recursive=False, clean_after=True):
+        if not isinstance(line, Line):
+            line = self[line]
+        else:
+            assert self[line.line_number] is line
+
+        if recursive:
+            for route in line.routes.values():
+                self._transit_data.routes.remove(route, recursive=True, clean_after=False)
+        else:
+            assert len(line.routes) == 0
+
+        del self._objects[line.line_number]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for line in self:
+            if next((route for route in line.routes.iterkeys()), None) is None:
+                to_clean.append(line)
+
+        for line in to_clean:
+            del self._objects[line.line_number]
+
     def validate(self):
         for i, obj in self._objects.iteritems():
             assert i == obj.line_number

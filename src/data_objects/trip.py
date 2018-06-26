@@ -141,6 +141,33 @@ class TripCollection(BaseGtfsObjectCollection):
         trip.route.trips.append(trip)
         return trip
 
+    def remove(self, trip, recursive=False, clean_after=True):
+        if not isinstance(trip, Trip):
+            trip = self[trip]
+        else:
+            assert self[trip.trip_id] is trip
+
+        if recursive:
+            for stop_time in trip.stop_times:
+                stop_time.stop.stop_times.remove(stop_time)
+
+        else:
+            assert len(trip.stop_times) == 0
+
+        del self._objects[trip.trip_id]
+
+        if clean_after:
+            self._transit_data.clean()
+
+    def clean(self):
+        to_clean = []
+        for trip in self:
+            if len(trip.stop_times) == 0:
+                to_clean.append(trip)
+
+        for trip in to_clean:
+            del self._objects[trip.trip_id]
+
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
