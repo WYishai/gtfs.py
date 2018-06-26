@@ -28,37 +28,31 @@ class TransitData:
     def load_gtfs_file(self, gtfs_file, validate=True):
         assert not self.has_changed
 
-        if isinstance(gtfs_file, str):
-            with open(gtfs_file, "rb") as gtfs_real_file:
-                self.load_gtfs_file(gtfs_real_file)
-            return
+        with ZipFile(gtfs_file) as zip_file:
+            with zip_file.open("agency.txt", "r") as agency_file:
+                self.agencies._load_file(agency_file)
 
-        zip_file = ZipFile(gtfs_file)
+            with zip_file.open("routes.txt", "r") as routes_file:
+                self.routes._load_file(routes_file)
 
-        with zip_file.open("agency.txt", "r") as agency_file:
-            self.agencies._load_file(agency_file)
+            with zip_file.open("shapes.txt", "r") as shapes_file:
+                self.shapes._load_file(shapes_file)
 
-        with zip_file.open("routes.txt", "r") as routes_file:
-            self.routes._load_file(routes_file)
+            with zip_file.open("calendar.txt", "r") as calendar_file:
+                self.calendar._load_file(calendar_file)
 
-        with zip_file.open("shapes.txt", "r") as shapes_file:
-            self.shapes._load_file(shapes_file)
+            with zip_file.open("trips.txt", "r") as trips_file:
+                self.trips._load_file(trips_file)
 
-        with zip_file.open("calendar.txt", "r") as calendar_file:
-            self.calendar._load_file(calendar_file)
+            with zip_file.open("stops.txt", "r") as stops_file:
+                self.stops._load_file(stops_file)
 
-        with zip_file.open("trips.txt", "r") as trips_file:
-            self.trips._load_file(trips_file)
-
-        with zip_file.open("stops.txt", "r") as stops_file:
-            self.stops._load_file(stops_file)
-
-        with zip_file.open("stop_times.txt", "r") as stop_times_file:
-            reader = csv.DictReader(stop_times_file)
-            for row in reader:
-                stop_time = StopTime(transit_data=self, **row)
-                stop_time.trip.stop_times.add(stop_time)
-                stop_time.stop.stop_times.append(stop_time)
+            with zip_file.open("stop_times.txt", "r") as stop_times_file:
+                reader = csv.DictReader(stop_times_file)
+                for row in reader:
+                    stop_time = StopTime(transit_data=self, **row)
+                    stop_time.trip.stop_times.add(stop_time)
+                    stop_time.stop.stop_times.append(stop_time)
 
         if validate:
             self.validate()
