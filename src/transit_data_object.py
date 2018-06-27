@@ -235,3 +235,10 @@ class TransitData:
         self.stops.validate()
 
         self.is_validated = True
+
+    def __eq__(self, other):
+        if not isinstance(other, TransitData):
+            return False
+
+        return self.agencies == other.agencies and self.routes == other.routes and self.trips == other.trips and \
+               self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops

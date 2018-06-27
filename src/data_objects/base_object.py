@@ -1,9 +1,15 @@
 import csv
 import sys
 
+import transit_data_object
+
 
 class BaseGtfsObjectCollection(object):
     def __init__(self, transit_data):
+        """
+        :type transit_data: transit_data_object.TransitData
+        """
+
         self._transit_data = transit_data
         self._objects = {}
 
@@ -31,6 +37,12 @@ class BaseGtfsObjectCollection(object):
 
     def __contains__(self, item):
         return item in self._objects
+
+    def __eq__(self, other):
+        if not isinstance(other, BaseGtfsObjectCollection):
+            return False
+
+        return self._objects == other._objects
 
     def __sizeof__(self):
         size = object.__sizeof__(self)

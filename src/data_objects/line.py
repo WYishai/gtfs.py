@@ -1,5 +1,6 @@
 import itertools
 
+import transit_data_object
 import data_objects.agency
 from data_objects.base_object import BaseGtfsObjectCollection
 
@@ -32,7 +33,7 @@ class Line:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert transit_data.agencies[self.agency.agency_id] is self.agency
@@ -49,7 +50,7 @@ class LineCollection(BaseGtfsObjectCollection):
         self._transit_data._changed()
 
         if line_number not in self:
-            line = data_objects.line.Line(self._agency, line_number)
+            line = Line(self._agency, line_number)
             self._objects[line_number] = line
         else:
             line = self[line_number]

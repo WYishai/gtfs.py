@@ -59,7 +59,7 @@ class StopTime:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert transit_data.trips[self.trip.trip_id] is self.trip
