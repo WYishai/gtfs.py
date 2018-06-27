@@ -75,7 +75,7 @@ class Route:
                 "route_desc": self.route_desc,
                 "route_color": self.route_color,
                 "route_text_color": self.route_text_color,
-                "bikes_allowed": 1 if self.bikes_allowed else 0}
+                "bikes_allowed": self.bikes_allowed}
 
     def validate(self, transit_data):
         """
