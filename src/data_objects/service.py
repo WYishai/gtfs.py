@@ -56,10 +56,17 @@ class Service:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         pass
+
+    def __eq__(self, other):
+        if not isinstance(other, Service):
+            return False
+
+        return self.service_id == other.service_id and self.start_date == other.start_date and \
+               self.end_date == other.end_date and self.days_relevance == other.days_relevance
 
 
 class ServiceCollection(BaseGtfsObjectCollection):

@@ -5,7 +5,7 @@ from operator import attrgetter
 from sortedcontainers import SortedList
 
 import data_objects.shape
-import transit_data
+import transit_data_object
 from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default
 
@@ -15,7 +15,7 @@ class Trip:
                  direction_id=None, block_id=None, shape_id=None, bikes_allowed=None, wheelchair_accessible=None,
                  original_trip_id=None, **kwargs):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         :type trip_id: str
         :type route_id: str
         :type service_id: str | int
@@ -111,7 +111,7 @@ class Trip:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert transit_data.routes[self.route.route_id] is self.route
@@ -122,6 +122,17 @@ class Trip:
 
         for stop_time in self.stop_times:
             stop_time.validate(transit_data)
+
+    def __eq__(self, other):
+        if not isinstance(other, Trip):
+            return False
+
+        return self.trip_id == other.trip_id and self.route == other.route and self.service == other.service and \
+               self.trip_headsign == other.trip_headsign and self.trip_short_name == other.trip_short_name and \
+               self.direction_id == other.direction_id and self.block_id == other.block_id and \
+               self.shape == other.shape and self.bikes_allowed == other.bikes_allowed and \
+               self.wheelchair_accessible == other.wheelchair_accessible and \
+               self.original_trip_id == other.original_trip_id
 
 
 class TripCollection(BaseGtfsObjectCollection):

@@ -51,10 +51,19 @@ class Agency:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         self.lines.validate()
+
+    def __eq__(self, other):
+        if not isinstance(other, Agency):
+            return False
+
+        return self.agency_id == other.agency_id and self.agency_name == other.agency_name and \
+               self.agency_url == other.agency_url and self.agency_timezone == other.agency_timezone and \
+               self.agency_lang == other.agency_lang and self.agency_phone == other.agency_phone and \
+               self.agency_email == other.agency_email and self.agency_fare_url == other.agency_fare_url
 
 
 class AgencyCollection(BaseGtfsObjectCollection):

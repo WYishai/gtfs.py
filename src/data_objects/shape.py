@@ -23,6 +23,15 @@ class ShapePoint:
 
         assert len(kwargs) == 0
 
+    def __eq__(self, other):
+        if not isinstance(other, ShapePoint):
+            return False
+
+        return self.shape_pt_lat == other.shape_pt_lat and self.shape_pt_lon == other.shape_pt_lon and \
+               self.shape_pt_sequence == other.shape_pt_sequence and \
+               (self.shape_dist_traveled is None or other.shape_dist_traveled is None or
+                self.shape_dist_traveled == other.shape_dist_traveled)
+
 
 class Shape:
     def __init__(self, shape_id):
@@ -47,10 +56,16 @@ class Shape:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert len(self.shape_points) != 0
+
+    def __eq__(self, other):
+        if not isinstance(other, Shape):
+            return False
+
+        return self.shape_id == other.shape_id and self.shape_points == other.shape_points
 
 
 class ShapeCollection(BaseGtfsObjectCollection):

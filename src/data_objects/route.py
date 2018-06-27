@@ -1,6 +1,6 @@
 import csv
 
-import transit_data
+import transit_data_object
 from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default
 
@@ -9,7 +9,7 @@ class Route:
     def __init__(self, transit_data, route_id, route_short_name, route_long_name, route_type, agency_id,
                  route_desc=None, route_color=None, route_text_color=None, bikes_allowed=None, **kwargs):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         :type route_id: str
         :type route_short_name: str
         :type route_long_name: str
@@ -79,12 +79,22 @@ class Route:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert transit_data.agencies[self.agency.agency_id] is self.agency
         assert self.route_type in xrange(0, 8)
         assert self.bikes_allowed is None or self.bikes_allowed in xrange(0, 3)
+
+    def __eq__(self, other):
+        if not isinstance(other, Route):
+            return False
+
+        return self.route_id == other.route_id and self.route_short_name == other.route_short_name and \
+               self.route_long_name == other.route_long_name and self.route_type == other.route_type and \
+               self.agency == other.agency and self.route_desc == other.route_desc and \
+               self.route_color == other.route_color and self.route_text_color == other.route_text_color and \
+               self.bikes_allowed == other.bikes_allowed
 
 
 class RouteCollection(BaseGtfsObjectCollection):

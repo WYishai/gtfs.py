@@ -1,6 +1,6 @@
 import csv
 
-import transit_data
+import transit_data_object
 from data_objects.base_object import BaseGtfsObjectCollection
 from utils.parsing import parse_or_default, str_to_bool
 
@@ -10,7 +10,7 @@ class Stop:
                  zone_id=None, stop_url=None, location_type=None, parent_station=None, stop_timezone=None,
                  wheelchair_boarding=None, **kwargs):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         :type stop_id: str | int
         :type stop_name: str
         :type stop_lat: str | float
@@ -63,11 +63,22 @@ class Stop:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data.TransitData
+        :type transit_data: transit_data_object.TransitData
         """
 
         assert self.parent_station is None or self.parent_station in transit_data.stops
         assert self.wheelchair_boarding is None or self.wheelchair_boarding in xrange(0, 3)
+
+    def __eq__(self, other):
+        if not isinstance(other, Stop):
+            return False
+
+        return self.stop_id == other.stop_id and self.stop_name == other.stop_name and \
+               self.stop_lat == other.stop_lat and self.stop_lon == other.stop_lon and \
+               self.stop_code == other.stop_code and self.stop_desc == other.stop_desc and \
+               self.zone_id == other.zone_id and self.stop_url == other.stop_url and \
+               self.is_central_station == other.is_central_station and self.parent_station == other.parent_station and \
+               self.stop_timezone == other.stop_timezone and self.wheelchair_boarding == other.wheelchair_boarding
 
 
 class StopCollection(BaseGtfsObjectCollection):
