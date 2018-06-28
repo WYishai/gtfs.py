@@ -1,8 +1,8 @@
 import csv
 from datetime import datetime
 
-from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default, str_to_bool
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default, str_to_bool
 
 
 class Service:

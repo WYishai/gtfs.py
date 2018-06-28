@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-import transit_data_object
-from utils.parsing import parse_or_default, str_to_bool
-from utils.time import parse_timedelta
+import gtfspy
+from gtfspy.utils.parsing import parse_or_default, str_to_bool
+from gtfspy.utils.time import parse_timedelta
 
 
 class StopTime:
@@ -15,7 +15,7 @@ class StopTime:
     def __init__(self, transit_data, trip_id, arrival_time, departure_time, stop_id, stop_sequence, pickup_type=None,
                  drop_off_type=None, shape_dist_traveled=None, stop_headsign=None, timepoint=None, **kwargs):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         :type trip_id: str
         :type arrival_time: str | timedelta
         :type departure_time: str | timedelta
@@ -59,7 +59,7 @@ class StopTime:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         assert transit_data.trips[self.trip.trip_id] is self.trip

@@ -4,10 +4,9 @@ from operator import attrgetter
 
 from sortedcontainers import SortedList
 
-import data_objects.shape
-import transit_data_object
-from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default
+import gtfspy
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default
 
 
 class Trip:
@@ -15,7 +14,7 @@ class Trip:
                  direction_id=None, block_id=None, shape_id=None, bikes_allowed=None, wheelchair_accessible=None,
                  original_trip_id=None, **kwargs):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         :type trip_id: str
         :type route_id: str
         :type service_id: str | int
@@ -23,7 +22,7 @@ class Trip:
         :type trip_short_name: str | None
         :type direction_id: str | int | None
         :type block_id: str | None
-        :type shape_id: data_objects.shape.Shape | str | int | None
+        :type shape_id: str | int | None
         :type bikes_allowed: str | int | None
         :type wheelchair_accessible: str | int | None
         :type original_trip_id: str | None
@@ -111,7 +110,7 @@ class Trip:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         assert transit_data.routes[self.route.route_id] is self.route

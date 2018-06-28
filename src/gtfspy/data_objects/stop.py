@@ -1,8 +1,8 @@
 import csv
 
-import transit_data_object
-from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default, str_to_bool
+import gtfspy
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default, str_to_bool
 
 
 class Stop:
@@ -10,7 +10,7 @@ class Stop:
                  zone_id=None, stop_url=None, location_type=None, parent_station=None, stop_timezone=None,
                  wheelchair_boarding=None, **kwargs):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         :type stop_id: str | int
         :type stop_name: str
         :type stop_lat: str | float
@@ -63,7 +63,7 @@ class Stop:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         assert self.parent_station is None or self.parent_station in transit_data.stops

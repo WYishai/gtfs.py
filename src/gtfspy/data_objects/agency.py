@@ -1,14 +1,16 @@
 import csv
 
-from data_objects.base_object import BaseGtfsObjectCollection
-from data_objects.line import LineCollection
-from utils.parsing import parse_or_default
+import gtfspy
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.data_objects.line import LineCollection
+from gtfspy.utils.parsing import parse_or_default
 
 
 class Agency:
     def __init__(self, transit_data, agency_id, agency_name, agency_url, agency_timezone, agency_lang=None,
                  agency_phone=None, agency_email=None, agency_fare_url=None, **kwargs):
         """
+        :type transit_data: gtfspy.transit_data_object.TransitData
         :type agency_id: str | int
         :type agency_name: str
         :type agency_url: str
@@ -51,7 +53,7 @@ class Agency:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         self.lines.validate()

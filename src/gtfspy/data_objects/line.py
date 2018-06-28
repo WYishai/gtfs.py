@@ -1,14 +1,13 @@
 import itertools
 
-import transit_data_object
-import data_objects.agency
-from data_objects.base_object import BaseGtfsObjectCollection
+import gtfspy
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 
 
 class Line:
     def __init__(self, agency, line_number):
         """
-        :type agency: data_objects.agency.Agency
+        :type agency: gtfspy.data_objects.agency.Agency
         :type line_number: str
         """
 
@@ -33,7 +32,7 @@ class Line:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         assert transit_data.agencies[self.agency.agency_id] is self.agency

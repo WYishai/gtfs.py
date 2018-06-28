@@ -3,8 +3,8 @@ from operator import attrgetter
 
 from sortedcontainers import SortedList
 
-from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default
 
 
 class ShapePoint:

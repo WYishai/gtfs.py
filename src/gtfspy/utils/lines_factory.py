@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from data_objects import Line, Route
+from gtfspy.data_objects import Line, Route
 
 
 class LinesFactory:

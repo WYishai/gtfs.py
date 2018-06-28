@@ -3,7 +3,7 @@ import zipfile
 from cStringIO import StringIO
 from zipfile import ZipFile
 
-from data_objects import *
+from gtfspy.data_objects import *
 
 
 class TransitData:

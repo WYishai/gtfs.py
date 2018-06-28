@@ -1,15 +1,15 @@
 import csv
 
-import transit_data_object
-from data_objects.base_object import BaseGtfsObjectCollection
-from utils.parsing import parse_or_default
+import gtfspy
+from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default
 
 
 class Route:
     def __init__(self, transit_data, route_id, route_short_name, route_long_name, route_type, agency_id,
                  route_desc=None, route_color=None, route_text_color=None, bikes_allowed=None, **kwargs):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         :type route_id: str
         :type route_short_name: str
         :type route_long_name: str
@@ -79,7 +79,7 @@ class Route:
 
     def validate(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         assert transit_data.agencies[self.agency.agency_id] is self.agency

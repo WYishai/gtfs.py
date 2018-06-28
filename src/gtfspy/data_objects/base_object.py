@@ -1,13 +1,13 @@
 import csv
 import sys
 
-import transit_data_object
+import gtfspy
 
 
 class BaseGtfsObjectCollection(object):
     def __init__(self, transit_data):
         """
-        :type transit_data: transit_data_object.TransitData
+        :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         self._transit_data = transit_data
