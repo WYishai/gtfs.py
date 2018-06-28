@@ -103,7 +103,7 @@ class Trip:
                 "trip_short_name": self.trip_short_name,
                 "direction_id": self.direction_id,
                 "block_id": self.block_id,
-                "shape_id": self.shape.shape_id,
+                "shape_id": self.shape.shape_id if self.shape is not None else None,
                 "bikes_allowed": self.bikes_allowed,
                 "wheelchair_accessible": self.wheelchair_accessible,
                 "original_trip_id": self.original_trip_id}
