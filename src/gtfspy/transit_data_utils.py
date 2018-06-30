@@ -1,3 +1,6 @@
+from cStringIO import StringIO
+
+from gtfspy.data_objects import UnknownFile
 from gtfspy.transit_data_object import TransitData
 
 
@@ -23,14 +26,20 @@ def clone_transit_data(transit_data):
         for stop_time in trip.stop_times:
             new_transit_data.add_stop_time_object(stop_time, recursive=False)
 
+    for file_name, file_data in transit_data.unknown_files.iteritems():
+        with StringIO() as dome_file:
+            dome_file.write(file_data.data)
+            new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
+
     return new_transit_data
 
 
-def create_partial_transit_data(transit_data, lines):
+def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
     """
     :rtype: TransitData
     :type transit_data: TransitData
     :type lines: dict[int, list[str]]
+    :type add_unknown_files: bool
     """
 
     new_transit_data = TransitData()
@@ -52,5 +61,11 @@ def create_partial_transit_data(transit_data, lines):
                                 new_transit_data.add_stop_object(transit_data.stops[stop.parent_station])
                             new_transit_data.add_stop_object(stop)
                             new_transit_data.add_stop_time_object(stop_time)
+
+    if add_unknown_files:
+        for file_name, file_data in transit_data.unknown_files.iteritems():
+            with StringIO() as dome_file:
+                dome_file.write(file_data.data)
+                new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
 
     return new_transit_data
