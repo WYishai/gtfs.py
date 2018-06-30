@@ -36,11 +36,21 @@ def create_partial_transit_data(transit_data, lines):
     new_transit_data = TransitData()
 
     for agency_id, line_numbers in lines.iteritems():
+        agency = transit_data.agencies[agency_id]
+        new_transit_data.add_agency_object(agency, recursive=False)
         for line in transit_data.agencies[agency_id].lines:
             if line.line_number in line_numbers:
                 for route in line.routes.itervalues():
+                    new_transit_data.add_route_object(route, recursive=False)
                     for trip in route.trips:
+                        new_transit_data.add_service_object(trip.service)
+                        new_transit_data.add_shape_object(trip.shape)
+                        new_transit_data.add_trip_object(trip)
                         for stop_time in trip.stop_times:
-                            new_transit_data.add_stop_time_object(stop_time, recursive=True)
+                            stop = stop_time.stop
+                            if stop.parent_station is not None:
+                                new_transit_data.add_stop_object(transit_data.stops[stop.parent_station])
+                            new_transit_data.add_stop_object(stop)
+                            new_transit_data.add_stop_time_object(stop_time)
 
     return new_transit_data
