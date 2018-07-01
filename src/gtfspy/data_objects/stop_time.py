@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import gtfspy
 from gtfspy.utils.parsing import parse_or_default, str_to_bool
-from gtfspy.utils.time import parse_timedelta
+from gtfspy.utils.time import parse_timedelta, str_timedelta
 
 
 class StopTime:
@@ -47,8 +47,8 @@ class StopTime:
 
     def to_csv_line(self):
         return {"trip_id": self.trip.trip_id,
-                "arrival_time": self.arrival_time,
-                "departure_time": self.departure_time,
+                "arrival_time": None if self.arrival_time is None else str_timedelta(self.arrival_time),
+                "departure_time": None if self.departure_time is None else str_timedelta(self.departure_time),
                 "stop_id": self.stop.stop_id,
                 "stop_sequence": self.stop_sequence,
                 "pickup_type": 0 if self.allow_pickup else 1,
