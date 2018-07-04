@@ -42,13 +42,13 @@ def compare_gtfs_files(gtfs_file1, gtfs_file2, test_case):
         print '\nFile: "%s"' % (file_name,)
         with gtfs_file1.open(file_name, "r") as f:
             reader = csv.DictReader(f)
-            # TODO: improve performance by saving it to set()
-            lines = [clean_row(row) for row in reader]
+            lines = {tuple(sorted(clean_row(row).iteritems())) for row in reader}
 
         with gtfs_file2.open(file_name, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 row = clean_row(row)
+                row = tuple(sorted(row.iteritems()))
                 test_case.assertIn(row, lines)
                 lines.remove(row)
 
