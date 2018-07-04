@@ -14,6 +14,7 @@ class TransitData:
         self.calendar = ServiceCollection(self)
         self.trips = TripCollection(self)
         self.stops = StopCollection(self)
+        self.translator = Translator()
 
         # TODO: create dedicated object for unknown files collection
         # TODO: save the headers order in the unknown files
@@ -58,9 +59,13 @@ class TransitData:
                     stop_time.trip.stop_times.add(stop_time)
                     stop_time.stop.stop_times.append(stop_time)
 
+            if "translations.txt" in zip_file.namelist():
+                with zip_file.open("translations.txt", "r") as translation_file:
+                    self.translator._load_file(translation_file)
+
             for inner_file in zip_file.filelist:
                 if inner_file.filename not in ["agency.txt", "routes.txt", "shapes.txt", "calendar.txt", "trips.txt",
-                                               "stops.txt", "stop_times.txt"]:
+                                               "stops.txt", "stop_times.txt", "translations.txt"]:
                     with zip_file.open(inner_file, "r") as f:
                         self.unknown_files[inner_file.filename] = UnknownFile(f)
 
@@ -116,6 +121,12 @@ class TransitData:
                     writer.writerow(stop_time.to_csv_line())
             zip_file.writestr("stop_times.txt", dome_file.getvalue())
             dome_file.close()
+
+            if self.translator.has_data():
+                dome_file = StringIO()
+                self.translator.save(dome_file)
+                zip_file.writestr("translations.txt", dome_file.getvalue())
+                dome_file.close()
 
             for file_name, file_data in self.unknown_files.iteritems():
                 zip_file.writestr(file_name, file_data.data)
