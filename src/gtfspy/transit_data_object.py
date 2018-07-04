@@ -264,8 +264,18 @@ class TransitData:
         if not isinstance(other, TransitData):
             return False
 
-        return self.agencies == other.agencies and self.routes == other.routes and self.trips == other.trips and \
-               self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops
+        if self.agencies == other.agencies and self.routes == other.routes and self.trips == other.trips and \
+                self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops:
+            for trip in self.trips:
+                if len(trip.stop_times) != len(other.trips[trip.trip_id].stop_times):
+                    return False
+                for i, stop_time in enumerate(trip.stop_times):
+                    if stop_time != other.trips[trip.trip_id].stop_times[i]:
+                        return False
+
+            return True
+
+        return False
 
     def __ne__(self, other):
         return not (self == other)
