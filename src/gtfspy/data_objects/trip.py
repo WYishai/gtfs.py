@@ -133,6 +133,9 @@ class Trip:
                self.wheelchair_accessible == other.wheelchair_accessible and \
                self.original_trip_id == other.original_trip_id
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class TripCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

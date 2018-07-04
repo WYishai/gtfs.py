@@ -266,3 +266,6 @@ class TransitData:
 
         return self.agencies == other.agencies and self.routes == other.routes and self.trips == other.trips and \
                self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops
+
+    def __ne__(self, other):
+        return not (self == other)

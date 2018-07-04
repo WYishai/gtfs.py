@@ -67,6 +67,9 @@ class Agency:
                self.agency_lang == other.agency_lang and self.agency_phone == other.agency_phone and \
                self.agency_email == other.agency_email and self.agency_fare_url == other.agency_fare_url
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class AgencyCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

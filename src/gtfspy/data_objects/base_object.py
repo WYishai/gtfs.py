@@ -44,6 +44,9 @@ class BaseGtfsObjectCollection(object):
 
         return self._objects == other._objects
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __sizeof__(self):
         size = object.__sizeof__(self)
         for k, v in self.__dict__.iteritems():

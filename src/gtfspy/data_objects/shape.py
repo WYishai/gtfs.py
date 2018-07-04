@@ -32,6 +32,9 @@ class ShapePoint:
                (self.shape_dist_traveled is None or other.shape_dist_traveled is None or
                 self.shape_dist_traveled == other.shape_dist_traveled)
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class Shape:
     def __init__(self, shape_id):
@@ -66,6 +69,9 @@ class Shape:
             return False
 
         return self.shape_id == other.shape_id and self.shape_points == other.shape_points
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class ShapeCollection(BaseGtfsObjectCollection):

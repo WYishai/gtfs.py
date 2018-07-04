@@ -96,6 +96,9 @@ class Route:
                self.route_color == other.route_color and self.route_text_color == other.route_text_color and \
                self.bikes_allowed == other.bikes_allowed
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class RouteCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

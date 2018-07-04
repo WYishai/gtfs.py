@@ -80,6 +80,9 @@ class Stop:
                self.is_central_station == other.is_central_station and self.parent_station == other.parent_station and \
                self.stop_timezone == other.stop_timezone and self.wheelchair_boarding == other.wheelchair_boarding
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class StopCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):

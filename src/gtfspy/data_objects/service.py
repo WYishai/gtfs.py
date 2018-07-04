@@ -68,6 +68,9 @@ class Service:
         return self.service_id == other.service_id and self.start_date == other.start_date and \
                self.end_date == other.end_date and self.days_relevance == other.days_relevance
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class ServiceCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
