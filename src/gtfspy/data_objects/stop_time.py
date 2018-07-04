@@ -77,4 +77,4 @@ class StopTime:
                self.departure_time == other.departure_time and self.stop == other.stop and \
                self.stop_sequence == other.stop_sequence and self.allow_pickup == other.allow_pickup and \
                self.allow_drop_off == other.allow_drop_off and self.shape_dist_traveled == other.shape_dist_traveled and \
-               self.stop_headsign == other.stop_headsign and self.timepoint and other.timepoint
+               self.stop_headsign == other.stop_headsign and self.timepoint == other.timepoint
