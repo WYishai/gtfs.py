@@ -269,8 +269,8 @@ class TransitData:
             for trip in self.trips:
                 if len(trip.stop_times) != len(other.trips[trip.trip_id].stop_times):
                     return False
-                for i, stop_time in enumerate(trip.stop_times):
-                    if stop_time != other.trips[trip.trip_id].stop_times[i]:
+                for self_stop_time, other_stop_time in zip(trip.stop_times, other.trips[trip.trip_id].stop_times):
+                    if self_stop_time != other_stop_time:
                         return False
 
             return True
