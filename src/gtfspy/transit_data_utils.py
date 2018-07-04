@@ -27,9 +27,10 @@ def clone_transit_data(transit_data):
             new_transit_data.add_stop_time_object(stop_time, recursive=False)
 
     for file_name, file_data in transit_data.unknown_files.iteritems():
-        with StringIO() as dome_file:
-            dome_file.write(file_data.data)
-            new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
+        dome_file = StringIO()
+        dome_file.write(file_data.data)
+        new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
+        dome_file.close()
 
     return new_transit_data
 
@@ -64,8 +65,9 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
 
     if add_unknown_files:
         for file_name, file_data in transit_data.unknown_files.iteritems():
-            with StringIO() as dome_file:
-                dome_file.write(file_data.data)
-                new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
+            dome_file = StringIO()
+            dome_file.write(file_data.data)
+            new_transit_data.unknown_files[file_name] = UnknownFile(dome_file)
+            dome_file.close()
 
     return new_transit_data
