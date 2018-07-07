@@ -1,8 +1,7 @@
 import unittest
 
-from gtfspy import TransitData, clone_transit_data, create_partial_transit_data
-
 import constants
+from gtfspy import TransitData, clone_transit_data, create_partial_transit_data
 
 
 class TestTransitDataUtils(unittest.TestCase):
@@ -16,7 +15,7 @@ class TestTransitDataUtils(unittest.TestCase):
         td1 = TransitData(gtfs_file=constants.GTFS_TEST_FILE_PATH)
         td2 = create_partial_transit_data(td1, lines)
         self.assertEqual(len(td2.agencies), len(lines.keys()))
-        self.assertEqual(iter(td2.agencies).next().agency_id, lines.keys()[0])
+        self.assertEqual(sorted(agency.agency_id for agency in td2.agencies), sorted(lines.iterkeys()))
 
 
 if __name__ == '__main__':
