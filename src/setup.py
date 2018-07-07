@@ -7,9 +7,9 @@ setup(
 
     author="Yishai Wiesner",
     author_email="wyishai AT gmail DOT com",
-    description="",
+    description="A simple python library for parsing, editing and writing GTFS files",
     install_requires=['sortedcontainers'],
-    url="",
+    url="https://github.com/WYishai/gtfs.py",
     classifiers=[
         "Programming Language :: Python :: 2.7"
     ],
