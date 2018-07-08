@@ -25,6 +25,10 @@ def clone_transit_data(transit_data):
         new_transit_data.add_trip_object(trip, recursive=False)
         for stop_time in trip.stop_times:
             new_transit_data.add_stop_time_object(stop_time, recursive=False)
+    for fare_attribute in transit_data.fare_attributes:
+        new_transit_data.add_fare_attribute_object(fare_attribute, recursive=False)
+    for fare_rule in transit_data.fare_rules:
+        new_transit_data.add_fare_rule_object(fare_rule, recursive=False)
 
     for file_name, file_data in transit_data.unknown_files.iteritems():
         dome_file = StringIO()
@@ -62,6 +66,14 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
                                 new_transit_data.add_stop_object(transit_data.stops[stop.parent_station])
                             new_transit_data.add_stop_object(stop)
                             new_transit_data.add_stop_time_object(stop_time)
+
+    for fare_rule in transit_data.fare_rules:
+        zone_ids = {stop.zone_id for stop in new_transit_data.stops}
+        if (fare_rule.route is None or fare_rule.route.route_id in new_transit_data.routes) and \
+                (fare_rule.origin_id is None or fare_rule.origin_id in zone_ids) and \
+                (fare_rule.destination_id is None or fare_rule.destination_id in zone_ids) and \
+                (fare_rule.contains_id is None or fare_rule.contains_id in zone_ids):
+            new_transit_data.add_fare_rule_object(fare_rule, recursive=True)
 
     if add_unknown_files:
         for file_name, file_data in transit_data.unknown_files.iteritems():

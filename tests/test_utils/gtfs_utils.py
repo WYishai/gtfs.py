@@ -1,5 +1,6 @@
 import csv
 from zipfile import ZipFile
+import unittest
 
 ignored_keys = []
 
@@ -19,6 +20,12 @@ def clean_row(row):
 
 
 def compare_gtfs_files(gtfs_file1, gtfs_file2, test_case):
+    """
+    :type gtfs_file1: str | ZipFile
+    :type gtfs_file2: str | ZipFile
+    :type test_case: unittest.TestCase
+    """
+
     if not isinstance(gtfs_file1, ZipFile):
         with ZipFile(gtfs_file1) as gtfs_file1:
             return compare_gtfs_files(gtfs_file1, gtfs_file2, test_case)

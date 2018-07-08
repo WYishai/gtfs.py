@@ -15,6 +15,8 @@ class TransitData:
         self.trips = TripCollection(self)
         self.stops = StopCollection(self)
         self.translator = Translator()
+        self.fare_attributes = FareAttributeCollection(self)
+        self.fare_rules = FareRuleCollection(self)
 
         # TODO: create dedicated object for unknown files collection
         # TODO: save the headers order in the unknown files
@@ -63,9 +65,20 @@ class TransitData:
                 with zip_file.open("translations.txt", "r") as translation_file:
                     self.translator._load_file(translation_file)
 
+            if "fare_attributes.txt" in zip_file.namelist() and "fare_rules.txt" in zip_file.namelist():
+                with zip_file.open("fare_attributes.txt", "r") as fare_attributes_file:
+                    self.fare_attributes._load_file(fare_attributes_file)
+                with zip_file.open("fare_rules.txt", "r") as fare_rules_file:
+                    self.fare_rules._load_file(fare_rules_file)
+            else:
+                assert "fare_attributes.txt" in zip_file.namelist()
+                assert "fare_rules.txt" in zip_file.namelist()
+
             for inner_file in zip_file.filelist:
+                # TODO: collect this known files list on reading
                 if inner_file.filename not in ["agency.txt", "routes.txt", "shapes.txt", "calendar.txt", "trips.txt",
-                                               "stops.txt", "stop_times.txt", "translations.txt"]:
+                                               "stops.txt", "stop_times.txt", "translations.txt", "fare_attributes.txt",
+                                               "fare_rules.txt"]:
                     with zip_file.open(inner_file, "r") as f:
                         self.unknown_files[inner_file.filename] = UnknownFile(f)
 
@@ -126,6 +139,17 @@ class TransitData:
                 dome_file = StringIO()
                 self.translator.save(dome_file)
                 zip_file.writestr("translations.txt", dome_file.getvalue())
+                dome_file.close()
+
+            if self.fare_rules.has_data():
+                dome_file = StringIO()
+                self.fare_attributes.save(dome_file)
+                zip_file.writestr("fare_attributes.txt", dome_file.getvalue())
+                dome_file.close()
+
+                dome_file = StringIO()
+                self.fare_rules.save(dome_file)
+                zip_file.writestr("fare_rules.txt", dome_file.getvalue())
                 dome_file.close()
 
             for file_name, file_data in self.unknown_files.iteritems():
@@ -239,6 +263,30 @@ class TransitData:
             assert stop_time.stop.stop_id in self.stops and stop_time.stop == self.stops[stop_time.stop.stop_id]
         self.add_stop_time(**stop_time.to_csv_line())
 
+    def add_fare_attribute(self, **kwargs):
+        self.fare_attributes.add_fare_attribute(**kwargs)
+
+    def add_fare_attribute_object(self, fare_attribute, recursive=False):
+        assert isinstance(fare_attribute, FareAttribute)
+
+        if fare_attribute.fare_id not in self.fare_attributes:
+            self.fare_attributes.add_fare_attribute(**fare_attribute.to_csv_line())
+        else:
+            assert fare_attribute == self.fare_attributes[fare_attribute.fare_id]
+
+    def add_fare_rule(self, **kwargs):
+        self.fare_rules.add_fare_rule(**kwargs)
+
+    def add_fare_rule_object(self, fare_rule, recursive=False):
+        assert isinstance(fare_rule, FareRule)
+
+        if recursive:
+            self.add_fare_attribute_object(fare_rule.fare, recursive=True)
+        else:
+            assert fare_rule.fare.fare_id in self.fare_attributes \
+                   and fare_rule.fare == self.fare_attributes[fare_rule.fare.fare_id]
+        self.fare_rules.add_fare_rule(**fare_rule.to_csv_line())
+
     def clean(self):
         self.trips.clean()
         self.stops.clean()
@@ -246,6 +294,8 @@ class TransitData:
         self.calendar.clean()
         self.routes.clean()
         self.agencies.clean()
+        self.fare_rules.clean()
+        self.fare_attributes.clean()
 
     def validate(self, force=False):
         if self.is_validated and not force:
@@ -257,6 +307,8 @@ class TransitData:
         self.calendar.validate()
         self.trips.validate()
         self.stops.validate()
+        self.fare_attributes.validate()
+        self.fare_rules.validate()
 
         self.is_validated = True
 
@@ -265,7 +317,8 @@ class TransitData:
             return False
 
         if self.agencies == other.agencies and self.routes == other.routes and self.trips == other.trips and \
-                self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops:
+                self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops and \
+                self.fare_attributes == other.fare_attributes and self.fare_rules == other.fare_rules:
             for trip in self.trips:
                 if len(trip.stop_times) != len(other.trips[trip.trip_id].stop_times):
                     return False

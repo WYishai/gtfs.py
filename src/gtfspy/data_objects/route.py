@@ -125,6 +125,11 @@ class RouteCollection(BaseGtfsObjectCollection):
         if recursive:
             for trip in route.trips:
                 self._transit_data.trips.remove(trip, recursive=True, clean_after=False)
+
+            fare_rules_to_remove = [fare_rule for fare_rule in self._transit_data.fare_rules
+                                    if fare_rule.route is route]
+            for fare_rule in fare_rules_to_remove:
+                self._transit_data.fare_rules.remove(fare_rule, recursive=True, clean_after=False)
         else:
             assert len(route.trips) == 0
 

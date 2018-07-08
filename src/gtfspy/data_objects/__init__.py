@@ -1,4 +1,6 @@
 from agency import *
+from fare_attribute import *
+from fare_rule import *
 from line import *
 from route import *
 from service import *
