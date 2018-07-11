@@ -3,6 +3,7 @@ from datetime import datetime
 
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.parsing import parse_or_default, str_to_bool
+from gtfspy.utils.validating import not_none_or_empty
 
 
 class Service:
@@ -33,26 +34,87 @@ class Service:
         saturday = parse_or_default(saturday, False, str_to_bool)
         self.days_relevance = [sunday, monday, tuesday, wednesday, thursday, friday, saturday]
 
-        assert len(kwargs) == 0
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+
+    @property
+    def sunday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[0]
+
+    @property
+    def monday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[1]
+
+    @property
+    def tuesday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[2]
+
+    @property
+    def wednesday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[3]
+
+    @property
+    def thursday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[4]
+
+    @property
+    def friday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[5]
+
+    @property
+    def saturday(self):
+        """
+        :rtype: bool
+        """
+
+        return self.days_relevance[6]
 
     def is_active_on(self, date):
+        """
+        :rtype: bool
+        """
+
         return self.days_relevance[date.isoweekday() % 7]
 
     def get_csv_fields(self):
         return ["service_id", "start_date", "end_date", "sunday", "monday", "tuesday", "wednesday", "thursday",
-                "friday", "saturday"]
+                "friday", "saturday"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"service_id": self.service_id,
-                "start_date": self.start_date.strftime("%Y%m%d"),
-                "end_date": self.end_date.strftime("%Y%m%d"),
-                "sunday": 1 if self.days_relevance[0] else 0,
-                "monday": 1 if self.days_relevance[1] else 0,
-                "tuesday": 1 if self.days_relevance[2] else 0,
-                "wednesday": 1 if self.days_relevance[3] else 0,
-                "thursday": 1 if self.days_relevance[4] else 0,
-                "friday": 1 if self.days_relevance[5] else 0,
-                "saturday": 1 if self.days_relevance[6] else 0}
+        return dict(service_id=self.service_id,
+                    start_date=self.start_date.strftime("%Y%m%d"),
+                    end_date=self.end_date.strftime("%Y%m%d"),
+                    sunday=int(self.sunday),
+                    monday=int(self.monday),
+                    tuesday=int(self.tuesday),
+                    wednesday=int(self.wednesday),
+                    thursday=int(self.thursday),
+                    friday=int(self.friday),
+                    saturday=int(self.saturday),
+                    **self.attributes)
 
     def validate(self, transit_data):
         """
@@ -66,7 +128,8 @@ class Service:
             return False
 
         return self.service_id == other.service_id and self.start_date == other.start_date and \
-               self.end_date == other.end_date and self.days_relevance == other.days_relevance
+               self.end_date == other.end_date and self.days_relevance == other.days_relevance and \
+               self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

@@ -3,7 +3,7 @@ import csv
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.data_objects.line import LineCollection
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.validating import not_none_or_empty
 
 
 class Agency:
@@ -25,31 +25,64 @@ class Agency:
         self.agency_name = agency_name
         self.agency_url = agency_url
         self.agency_timezone = agency_timezone
-        self.agency_lang = parse_or_default(agency_lang, None, str)
-        self.agency_phone = parse_or_default(agency_phone, None, str)
-        self.agency_email = parse_or_default(agency_email, None, str)
-        self.agency_fare_url = parse_or_default(agency_fare_url, None, str)
+
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(agency_lang):
+            self.attributes["agency_lang"] = str(agency_lang)
+        if not_none_or_empty(agency_phone):
+            self.attributes["agency_phone"] = str(agency_phone)
+        if not_none_or_empty(agency_email):
+            self.attributes["agency_email"] = str(agency_email)
+        if not_none_or_empty(agency_fare_url):
+            self.attributes["agency_fare_url"] = str(agency_fare_url)
 
         self.lines = LineCollection(transit_data, self)
 
-        assert len(kwargs) == 0
+    @property
+    def agency_lang(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("agency_lang", None)
+
+    @property
+    def agency_phone(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("agency_phone", None)
+
+    @property
+    def agency_email(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("agency_email", None)
+
+    @property
+    def agency_fare_url(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("agency_fare_url", None)
 
     def get_line(self, route):
         return self.lines.get_line(route)
 
     def get_csv_fields(self):
-        return ["agency_id", "agency_name", "agency_url", "agency_timezone", "agency_lang", "agency_phone",
-                "agency_email", "agency_fare_url"]
+        return ["agency_id", "agency_name", "agency_url", "agency_timezone"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"agency_id": self.agency_id,
-                "agency_name": self.agency_name,
-                "agency_url": self.agency_url,
-                "agency_timezone": self.agency_timezone,
-                "agency_lang": self.agency_lang,
-                "agency_phone": self.agency_phone,
-                "agency_email": self.agency_email,
-                "agency_fare_url": self.agency_fare_url}
+        result = dict(agency_id=self.agency_id,
+                      agency_name=self.agency_name,
+                      agency_url=self.agency_url,
+                      agency_timezone=self.agency_timezone,
+                      **self.attributes)
+        return result
 
     def validate(self, transit_data):
         """
@@ -64,8 +97,7 @@ class Agency:
 
         return self.agency_id == other.agency_id and self.agency_name == other.agency_name and \
                self.agency_url == other.agency_url and self.agency_timezone == other.agency_timezone and \
-               self.agency_lang == other.agency_lang and self.agency_phone == other.agency_phone and \
-               self.agency_email == other.agency_email and self.agency_fare_url == other.agency_fare_url
+               self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

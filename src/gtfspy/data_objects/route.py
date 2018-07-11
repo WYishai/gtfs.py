@@ -2,7 +2,8 @@ import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 
 
 class Route:
@@ -27,28 +28,75 @@ class Route:
         # TODO: create dedicated object to route type
         self.route_type = int(route_type)
         self.agency = transit_data.agencies[int(agency_id)]
-        self.route_desc = parse_or_default(route_desc, None, str)
-        # TODO: find type for the route color
-        self.route_color = parse_or_default(route_color, None, str)
-        self.route_text_color = parse_or_default(route_text_color, None, str)
-        # TODO: create parser for yes-no-unknown: 0 for unknown, 1 for yes, and 2 for no
-        self.bikes_allowed = parse_or_default(bikes_allowed, None, int)
+
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(route_desc):
+            self.attributes["route_desc"] = str(route_desc)
+        if not_none_or_empty(route_color):
+            # TODO: find type for the route color
+            self.attributes["route_color"] = str(route_color)
+        if not_none_or_empty(route_text_color):
+            self.attributes["route_text_color"] = str(route_text_color)
+        if not_none_or_empty(bikes_allowed):
+            self.attributes["bikes_allowed"] = int(bikes_allowed)
 
         self.line = self.agency.get_line(self)
         self.trips = []
 
-        assert len(kwargs) == 0
+    @property
+    def route_desc(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("route_desc", None)
+
+    @property
+    def route_color(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("route_color", None)
+
+    @property
+    def route_text_color(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("route_text_color", None)
+
+    @property
+    def bikes_allowed(self):
+        """
+        :rtype: bool | None
+        """
+
+        return parse_yes_no_unknown(self.attributes.get("bikes_allowed", None))
 
     @property
     def stops(self):
+        """
+        :rtype: list[gtfspy.data_objects.Stop] | None
+        """
+
         return None if len(self.trips) == 0 else self.trips[0].stops
 
     @property
     def first_stop(self):
+        """
+        :rtype: gtfspy.data_objects.Stop | None
+        """
+
         return None if len(self.trips) == 0 else self.trips[0].first_stop
 
     @property
     def last_stop(self):
+        """
+        :rtype: gtfspy.data_objects.Stop | None
+        """
+
         return None if len(self.trips) == 0 else self.trips[0].last_stop
 
     def get_trips_calendar(self, from_date, to_date=None, stop_id=None, sort=True):
@@ -63,19 +111,16 @@ class Route:
         return res
 
     def get_csv_fields(self):
-        return ["route_id", "route_short_name", "route_long_name", "route_type", "agency_id", "route_desc",
-                "route_color", "route_text_color", "bikes_allowed"]
+        return ["route_id", "route_short_name", "route_long_name", "route_type", "agency_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"route_id": self.route_id,
-                "route_short_name": self.route_short_name,
-                "route_long_name": self.route_long_name,
-                "route_type": self.route_type,
-                "agency_id": self.agency.agency_id,
-                "route_desc": self.route_desc,
-                "route_color": self.route_color,
-                "route_text_color": self.route_text_color,
-                "bikes_allowed": self.bikes_allowed}
+        result = dict(route_id=self.route_id,
+                      route_short_name=self.route_short_name,
+                      route_long_name=self.route_long_name,
+                      route_type=self.route_type,
+                      agency_id=self.agency.agency_id,
+                      **self.attributes)
+        return result
 
     def validate(self, transit_data):
         """
@@ -84,7 +129,7 @@ class Route:
 
         assert transit_data.agencies[self.agency.agency_id] is self.agency
         assert self.route_type in xrange(0, 8)
-        assert self.bikes_allowed is None or self.bikes_allowed in xrange(0, 3)
+        assert validate_yes_no_unknown(self.attributes.get("bikes_allowed", None))
 
     def __eq__(self, other):
         if not isinstance(other, Route):
@@ -92,9 +137,7 @@ class Route:
 
         return self.route_id == other.route_id and self.route_short_name == other.route_short_name and \
                self.route_long_name == other.route_long_name and self.route_type == other.route_type and \
-               self.agency == other.agency and self.route_desc == other.route_desc and \
-               self.route_color == other.route_color and self.route_text_color == other.route_text_color and \
-               self.bikes_allowed == other.bikes_allowed
+               self.agency == other.agency and self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

@@ -1,17 +1,11 @@
 from datetime import timedelta
 
 import gtfspy
-from gtfspy.utils.parsing import parse_or_default, str_to_bool
 from gtfspy.utils.time import parse_timedelta, str_timedelta
+from gtfspy.utils.validating import not_none_or_empty, validate_true_false
 
 
 class StopTime:
-    _optional_arguments = {"pickup_type": (True, str_to_bool),
-                           "drop_off_type": (True, str_to_bool),
-                           "shape_dist_traveled": (0.0, float),
-                           "stop_headsign": (None, str),
-                           "timepoint": (None, int)}
-
     def __init__(self, transit_data, trip_id, arrival_time, departure_time, stop_id, stop_sequence, pickup_type=None,
                  drop_off_type=None, shape_dist_traveled=None, stop_headsign=None, timepoint=None, **kwargs):
         """
@@ -33,29 +27,62 @@ class StopTime:
         self.departure_time = parse_timedelta(departure_time)
         self.stop = transit_data.stops[int(stop_id)]
         self.stop_sequence = int(stop_sequence)
-        self.allow_pickup = parse_or_default(pickup_type, True, lambda v: not bool(int(v)))
-        self.allow_drop_off = parse_or_default(drop_off_type, True, lambda v: not bool(int(v)))
-        self.shape_dist_traveled = parse_or_default(shape_dist_traveled, None, float)
-        self.stop_headsign = parse_or_default(stop_headsign, None, str)
-        self.timepoint = parse_or_default(timepoint, None, int)
 
-        assert len(kwargs) == 0
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(pickup_type):
+            self.attributes["pickup_type"] = int(pickup_type)
+        if not_none_or_empty(drop_off_type):
+            self.attributes["drop_off_type"] = int(drop_off_type)
+        if not_none_or_empty(shape_dist_traveled):
+            self.attributes["shape_dist_traveled"] = float(shape_dist_traveled)
+        if not_none_or_empty(stop_headsign):
+            self.attributes["stop_headsign"] = str(stop_headsign)
+        if not_none_or_empty(timepoint):
+            self.attributes["timepoint"] = int(timepoint)
+
+    @property
+    def allow_pickup(self):
+        return not bool(self.attributes.get("pickup_type", 0))
+
+    @property
+    def allow_drop_off(self):
+        return not bool(self.attributes.get("drop_off_type", 0))
+
+    @property
+    def shape_dist_traveled(self):
+        """
+        :rtype: float | None
+        """
+
+        return self.attributes.get("shape_dist_traveled", None)
+
+    @property
+    def stop_headsign(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("stop_headsign", None)
+
+    @property
+    def timepoint(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("timepoint", None)
 
     def get_csv_fields(self):
-        return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "pickup_type", "drop_off_type",
-                "shape_dist_traveled", "stop_headsign", "timepoint"]
+        return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"trip_id": self.trip.trip_id,
-                "arrival_time": None if self.arrival_time is None else str_timedelta(self.arrival_time),
-                "departure_time": None if self.departure_time is None else str_timedelta(self.departure_time),
-                "stop_id": self.stop.stop_id,
-                "stop_sequence": self.stop_sequence,
-                "pickup_type": 0 if self.allow_pickup else 1,
-                "drop_off_type": 0 if self.allow_drop_off else 1,
-                "shape_dist_traveled": self.shape_dist_traveled,
-                "stop_headsign": self.stop_headsign,
-                "timepoint": self.timepoint}
+        result = dict(trip_id=self.trip.trip_id,
+                      arrival_time=str_timedelta(self.arrival_time),
+                      departure_time=str_timedelta(self.departure_time),
+                      stop_id=self.stop.stop_id,
+                      stop_sequence=self.stop_sequence,
+                      **self.attributes)
+        return result
 
     def validate(self, transit_data):
         """
@@ -66,6 +93,8 @@ class StopTime:
         assert transit_data.stops[self.stop.stop_id] is self.stop
 
         assert self.allow_pickup or self.allow_drop_off
+        assert validate_true_false(self.attributes.get("pickup_type", 0))
+        assert validate_true_false(self.attributes.get("drop_off_type", 0))
         assert self.arrival_time is not None or self.departure_time is not None
         assert self.arrival_time is None or self.departure_time is None or self.arrival_time <= self.departure_time
 
@@ -75,9 +104,7 @@ class StopTime:
 
         return self.trip == other.trip and self.arrival_time == other.arrival_time and \
                self.departure_time == other.departure_time and self.stop == other.stop and \
-               self.stop_sequence == other.stop_sequence and self.allow_pickup == other.allow_pickup and \
-               self.allow_drop_off == other.allow_drop_off and self.shape_dist_traveled == other.shape_dist_traveled and \
-               self.stop_headsign == other.stop_headsign and self.timepoint == other.timepoint
+               self.stop_sequence == other.stop_sequence and self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

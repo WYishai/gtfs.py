@@ -2,7 +2,7 @@ import csv
 import sys
 
 import gtfspy
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.validating import not_none_or_empty
 
 
 class FareRule:
@@ -18,37 +18,74 @@ class FareRule:
         """
 
         self.fare = transit_data.fare_attributes[fare_id]
-        self.route = parse_or_default(route_id, None, lambda x: transit_data.routes[route_id])
-        self.origin_id = parse_or_default(origin_id, None, int)
-        self.destination_id = parse_or_default(destination_id, None, int)
-        self.contains_id = parse_or_default(contains_id, None, int)
 
-        assert len(kwargs) == 0
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(route_id):
+            self.attributes["route_id"] = transit_data.routes[route_id]
+        if not_none_or_empty(origin_id):
+            self.attributes["origin_id"] = int(origin_id)
+        if not_none_or_empty(destination_id):
+            self.attributes["destination_id"] = int(destination_id)
+        if not_none_or_empty(contains_id):
+            self.attributes["contains_id"] = int(contains_id)
+
+    @property
+    def route(self):
+        """
+        :rtype: gtfspy.data_objects.Route | None
+        """
+
+        return self.attributes.get("route_id", None)
+
+    @property
+    def origin_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("origin_id", None)
+
+    @property
+    def destination_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("destination_id", None)
+
+    @property
+    def contains_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("contains_id", None)
 
     def get_csv_fields(self):
-        return ["fare_id", "route_id", "origin_id", "destination_id", "contains_id"]
+        return ["fare_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"fare_id": self.fare.fare_id,
-                "route_id": self.route.route_id,
-                "origin_id": self.origin_id,
-                "destination_id": self.destination_id,
-                "contains_id": self.contains_id}
+        result = dict(fare_id=self.fare.fare_id,
+                      **self.attributes)
+
+        if "route_id" in result:
+            result["route_id"] = self.route.route_id
+
+        return result
 
     def validate(self, transit_data):
         """
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        pass
+        assert transit_data.fare_attributes[self.fare.fare_id] is self.fare
+        assert self.route is None or transit_data.routes[self.route.route_id] is self.route
 
     def __eq__(self, other):
         if not isinstance(other, FareRule):
             return False
 
-        return self.fare.fare_id == other.fare.fare_id and self.route.route_id == other.route.route_id and \
-               self.origin_id == other.origin_id and self.destination_id == other.destination_id and \
-               self.contains_id == other.contains_id
+        return self.fare.fare_id == other.fare.fare_id and self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

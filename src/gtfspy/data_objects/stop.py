@@ -2,7 +2,8 @@ import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_or_default, str_to_bool
+from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.validating import not_none_or_empty, validate_true_false, validate_yes_no_unknown
 
 
 class Stop:
@@ -29,45 +30,111 @@ class Stop:
         self.stop_name = stop_name
         self.stop_lat = float(stop_lat)
         self.stop_lon = float(stop_lon)
-        self.stop_code = parse_or_default(stop_code, None, str)
-        self.stop_desc = parse_or_default(stop_desc, None, str)
-        self.zone_id = parse_or_default(zone_id, None, int)
-        self.stop_url = parse_or_default(stop_url, None, str)
-        self.is_central_station = parse_or_default(location_type, False, str_to_bool)
-        self.parent_station = parse_or_default(parent_station, None, int)
-        # self.parent_station = None if parent_station == '' else transit_data.stops[parent_station]
-        self.stop_timezone = parse_or_default(stop_timezone, None, str)
-        self.wheelchair_boarding = parse_or_default(wheelchair_boarding, None, int)
+
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(stop_code):
+            self.attributes["stop_code"] = str(stop_code)
+        if not_none_or_empty(stop_desc):
+            self.attributes["stop_desc"] = str(stop_desc)
+        if not_none_or_empty(zone_id):
+            self.attributes["zone_id"] = int(zone_id)
+        if not_none_or_empty(stop_url):
+            self.attributes["stop_url"] = str(stop_url)
+        if not_none_or_empty(location_type):
+            self.attributes["location_type"] = int(location_type)
+        if not_none_or_empty(parent_station):
+            # TODO: save the station object instead of the id
+            self.attributes["parent_station"] = int(parent_station)
+        if not_none_or_empty(stop_timezone):
+            self.attributes["stop_timezone"] = str(stop_timezone)
+        if not_none_or_empty(wheelchair_boarding):
+            self.attributes["wheelchair_boarding"] = int(wheelchair_boarding)
 
         self.stop_times = []
 
-        assert len(kwargs) == 0
+    @property
+    def stop_code(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("stop_code", None)
+
+    @property
+    def stop_desc(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("stop_desc", None)
+
+    @property
+    def zone_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("zone_id", None)
+
+    @property
+    def stop_url(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("stop_url", None)
+
+    @property
+    def is_central_station(self):
+        """
+        :rtype: bool
+        """
+
+        return bool(self.attributes.get("location_type", False))
+
+    @property
+    def parent_station(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("parent_station", None)
+
+    @property
+    def stop_timezone(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("stop_timezone", None)
+
+    @property
+    def wheelchair_boarding(self):
+        """
+        :rtype: bool | None
+        """
+
+        return parse_yes_no_unknown(self.attributes.get("wheelchair_boarding", None))
 
     def get_csv_fields(self):
-        return ["stop_id", "stop_name", "stop_lat", "stop_lon", "stop_code", "stop_desc", "zone_id", "stop_url",
-                "location_type", "parent_station", "stop_timezone", "wheelchair_boarding"]
+        return ["stop_id", "stop_name", "stop_lat", "stop_lon"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"stop_id": self.stop_id,
-                "stop_name": self.stop_name,
-                "stop_lat": self.stop_lat,
-                "stop_lon": self.stop_lon,
-                "stop_code": self.stop_code,
-                "stop_desc": self.stop_desc,
-                "zone_id": self.zone_id,
-                "stop_url": self.stop_url,
-                "location_type": 1 if self.is_central_station else 0,
-                "parent_station": self.parent_station,
-                "stop_timezone": self.stop_timezone,
-                "wheelchair_boarding": self.wheelchair_boarding}
+        result = dict(stop_id=self.stop_id,
+                      stop_name=self.stop_name,
+                      stop_lat=self.stop_lat,
+                      stop_lon=self.stop_lon,
+                      **self.attributes)
+        return result
 
     def validate(self, transit_data):
         """
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
+        assert validate_true_false(self.attributes.get("location_type", 0))
         assert self.parent_station is None or self.parent_station in transit_data.stops
-        assert self.wheelchair_boarding is None or self.wheelchair_boarding in xrange(0, 3)
+        assert validate_yes_no_unknown(self.attributes.get("wheelchair_boarding", None))
 
     def __eq__(self, other):
         if not isinstance(other, Stop):
@@ -75,10 +142,7 @@ class Stop:
 
         return self.stop_id == other.stop_id and self.stop_name == other.stop_name and \
                self.stop_lat == other.stop_lat and self.stop_lon == other.stop_lon and \
-               self.stop_code == other.stop_code and self.stop_desc == other.stop_desc and \
-               self.zone_id == other.zone_id and self.stop_url == other.stop_url and \
-               self.is_central_station == other.is_central_station and self.parent_station == other.parent_station and \
-               self.stop_timezone == other.stop_timezone and self.wheelchair_boarding == other.wheelchair_boarding
+               self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

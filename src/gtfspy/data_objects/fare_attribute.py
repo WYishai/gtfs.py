@@ -2,7 +2,7 @@ import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.validating import not_none_or_empty
 
 
 class FareAttribute:
@@ -12,13 +12,21 @@ class FareAttribute:
         self.currency_type = currency_type
         self.payment_method = int(payment_method)
         self.transfers = int(transfers)
-        self.transfer_duration = parse_or_default(transfer_duration, None, int)
 
-        self.args = kwargs
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(transfer_duration):
+            self.attributes["transfer_duration"] = int(transfer_duration)
+
+    @property
+    def transfer_duration(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("transfer_duration", None)
 
     def get_csv_fields(self):
-        return ["fare_id", "price", "currency_type", "payment_method", "transfers",
-                "transfer_duration"] + self.args.keys()
+        return ["fare_id", "price", "currency_type", "payment_method", "transfers"] + self.attributes.keys()
 
     def to_csv_line(self):
         return dict(fare_id=self.fare_id,
@@ -26,8 +34,7 @@ class FareAttribute:
                     currency_type=self.currency_type,
                     payment_method=self.payment_method,
                     transfers=self.transfers,
-                    transfer_duration=self.transfer_duration,
-                    **self.args)
+                    **self.attributes)
 
     def validate(self, transit_data):
         """
@@ -46,7 +53,7 @@ class FareAttribute:
 
         return self.fare_id == other.fare_id and self.price == other.price and \
                self.currency_type == other.currency_type and self.payment_method == other.payment_method and \
-               self.transfers == other.transfers and self.transfer_duration == other.transfer_duration
+               self.transfers == other.transfers and self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)

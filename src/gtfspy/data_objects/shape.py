@@ -1,10 +1,9 @@
 import csv
 from operator import attrgetter
 
-from sortedcontainers import SortedList
-
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.validating import not_none_or_empty
+from sortedcontainers import SortedList
 
 
 class ShapePoint:
@@ -19,9 +18,22 @@ class ShapePoint:
         self.shape_pt_lat = float(shape_pt_lat)
         self.shape_pt_lon = float(shape_pt_lon)
         self.shape_pt_sequence = int(shape_pt_sequence)
-        self.shape_dist_traveled = parse_or_default(shape_dist_traveled, None, float)
 
-        assert len(kwargs) == 0
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(shape_dist_traveled):
+            self.attributes["shape_dist_traveled"] = float(shape_dist_traveled)
+
+    @property
+    def shape_dist_traveled(self):
+        """
+        :rtype: float | None
+        """
+
+        return self.attributes.get("shape_dist_traveled", None)
+
+    def validate(self, transit_data):
+        # TODO: validate ShapePoint values
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, ShapePoint):
@@ -30,7 +42,8 @@ class ShapePoint:
         return self.shape_pt_lat == other.shape_pt_lat and self.shape_pt_lon == other.shape_pt_lon and \
                self.shape_pt_sequence == other.shape_pt_sequence and \
                (self.shape_dist_traveled is None or other.shape_dist_traveled is None or
-                self.shape_dist_traveled == other.shape_dist_traveled)
+                self.shape_dist_traveled == other.shape_dist_traveled) and \
+               self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)
@@ -47,15 +60,17 @@ class Shape:
         self.shape_points = SortedList(key=attrgetter("shape_pt_sequence"))
 
     def get_csv_fields(self):
-        return ["shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"]
+        return ["shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence"] + \
+               list({key for shape_point in self.shape_points for key in shape_point.attributes.iterkeys()})
 
     def to_csv_line(self):
         for shape_point in self.shape_points:
-            yield {"shape_id": self.shape_id,
-                   "shape_pt_lat": shape_point.shape_pt_lat,
-                   "shape_pt_lon": shape_point.shape_pt_lon,
-                   "shape_pt_sequence": shape_point.shape_pt_sequence,
-                   "shape_dist_traveled": shape_point.shape_dist_traveled}
+            result = dict(shape_id=self.shape_id,
+                          shape_pt_lat=shape_point.shape_pt_lat,
+                          shape_pt_lon=shape_point.shape_pt_lon,
+                          shape_pt_sequence=shape_point.shape_pt_sequence,
+                          **shape_point.attributes)
+            yield result
 
     def validate(self, transit_data):
         """
@@ -63,6 +78,8 @@ class Shape:
         """
 
         assert len(self.shape_points) != 0
+        for shape_point in self.shape_points:
+            shape_point.validate(transit_data)
 
     def __eq__(self, other):
         if not isinstance(other, Shape):

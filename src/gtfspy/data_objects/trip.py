@@ -2,11 +2,11 @@ import csv
 from datetime import datetime, date, time, timedelta
 from operator import attrgetter
 
-from sortedcontainers import SortedList
-
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_or_default
+from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
+from sortedcontainers import SortedList
 
 
 class Trip:
@@ -31,18 +31,90 @@ class Trip:
         self.trip_id = trip_id
         self.route = transit_data.routes[route_id]
         self.service = transit_data.calendar[int(service_id)]
-        self.trip_headsign = parse_or_default(trip_headsign, None, str)
-        self.trip_short_name = parse_or_default(trip_short_name, None, str)
-        self.direction_id = parse_or_default(direction_id, None, int)
-        self.block_id = parse_or_default(block_id, None, str)
-        self.shape = parse_or_default(shape_id, None, lambda s: transit_data.shapes[int(shape_id)])
-        self.bikes_allowed = parse_or_default(bikes_allowed, None, int)
-        self.wheelchair_accessible = parse_or_default(wheelchair_accessible, None, int)
-        self.original_trip_id = parse_or_default(original_trip_id, None, str)
+
+        self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(trip_headsign):
+            self.attributes["trip_headsign"] = str(trip_headsign)
+        if not_none_or_empty(trip_short_name):
+            self.attributes["trip_short_name"] = str(trip_short_name)
+        if not_none_or_empty(direction_id):
+            self.attributes["direction_id"] = int(direction_id)
+        if not_none_or_empty(block_id):
+            self.attributes["block_id"] = int(block_id)
+        if not_none_or_empty(shape_id):
+            self.attributes["shape_id"] = transit_data.shapes[int(shape_id)]
+        if not_none_or_empty(bikes_allowed):
+            self.attributes["bikes_allowed"] = int(bikes_allowed)
+        if not_none_or_empty(wheelchair_accessible):
+            self.attributes["wheelchair_accessible"] = int(wheelchair_accessible)
+        if not_none_or_empty(original_trip_id):
+            self.attributes["original_trip_id"] = str(original_trip_id)
 
         self.stop_times = SortedList(key=attrgetter("stop_sequence"))
 
-        assert len(kwargs) == 0
+    @property
+    def trip_headsign(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("trip_headsign", None)
+
+    @property
+    def trip_short_name(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("trip_short_name", None)
+
+    @property
+    def direction_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("direction_id", None)
+
+    @property
+    def block_id(self):
+        """
+        :rtype: int | None
+        """
+
+        return self.attributes.get("block_id", None)
+
+    @property
+    def shape(self):
+        """
+        :rtype: gtfspy.data_objects.Shape | None
+        """
+
+        return self.attributes.get("shape_id", None)
+
+    @property
+    def bikes_allowed(self):
+        """
+        :rtype: bool | None
+        """
+
+        return parse_yes_no_unknown(self.attributes.get("bikes_allowed", None))
+
+    @property
+    def wheelchair_accessible(self):
+        """
+        :rtype: bool | None
+        """
+
+        return parse_yes_no_unknown(self.attributes.get("wheelchair_accessible", None))
+
+    @property
+    def original_trip_id(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("original_trip_id", None)
 
     @property
     def start_time(self):
@@ -53,14 +125,26 @@ class Trip:
 
     @property
     def stops(self):
+        """
+        :rtype: list[gtfspy.data_objects.Stop]
+        """
+
         return [stop_time.stop for stop_time in self.stop_times]
 
     @property
     def first_stop(self):
+        """
+        :rtype: gtfspy.data_objects.Stop
+        """
+
         return self.stops[0]
 
     @property
     def last_stop(self):
+        """
+        :rtype: gtfspy.data_objects.Stop
+        """
+
         return self.stops[-1]
 
     def get_trip_calendar(self, from_date, to_date=None, stop_id=None):
@@ -92,21 +176,18 @@ class Trip:
             i += day_interval
 
     def get_csv_fields(self):
-        return ["trip_id", "route_id", "service_id", "trip_headsign", "trip_short_name", "direction_id", "block_id",
-                "shape_id", "bikes_allowed", "wheelchair_accessible", "original_trip_id"]
+        return ["trip_id", "route_id", "service_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return {"trip_id": self.trip_id,
-                "route_id": self.route.route_id,
-                "service_id": self.service.service_id,
-                "trip_headsign": self.trip_headsign,
-                "trip_short_name": self.trip_short_name,
-                "direction_id": self.direction_id,
-                "block_id": self.block_id,
-                "shape_id": self.shape.shape_id if self.shape is not None else None,
-                "bikes_allowed": self.bikes_allowed,
-                "wheelchair_accessible": self.wheelchair_accessible,
-                "original_trip_id": self.original_trip_id}
+        result = dict(trip_id=self.trip_id,
+                      route_id=self.route.route_id,
+                      service_id=self.service.service_id,
+                      **self.attributes)
+
+        if "shape_id" in result:
+            result["shape_id"] = self.shape.shape_id
+
+        return result
 
     def validate(self, transit_data):
         """
@@ -116,8 +197,8 @@ class Trip:
         assert transit_data.routes[self.route.route_id] is self.route
         assert transit_data.calendar[self.service.service_id] is self.service
         assert self.shape is None or transit_data.shapes[self.shape.shape_id] is self.shape
-        assert self.bikes_allowed is None or self.bikes_allowed in xrange(0, 3)
-        assert self.wheelchair_accessible is None or self.wheelchair_accessible in xrange(0, 3)
+        assert validate_yes_no_unknown(self.attributes.get("bikes_allowed", None))
+        assert validate_yes_no_unknown(self.attributes.get("wheelchair_accessible", None))
 
         for stop_time in self.stop_times:
             stop_time.validate(transit_data)
@@ -127,11 +208,7 @@ class Trip:
             return False
 
         return self.trip_id == other.trip_id and self.route == other.route and self.service == other.service and \
-               self.trip_headsign == other.trip_headsign and self.trip_short_name == other.trip_short_name and \
-               self.direction_id == other.direction_id and self.block_id == other.block_id and \
-               self.shape == other.shape and self.bikes_allowed == other.bikes_allowed and \
-               self.wheelchair_accessible == other.wheelchair_accessible and \
-               self.original_trip_id == other.original_trip_id
+               self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)
