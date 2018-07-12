@@ -36,6 +36,8 @@ class TransitData:
         assert not self.has_changed
 
         with ZipFile(gtfs_file) as zip_file:
+            zip_files_list = zip_file.namelist()
+
             with zip_file.open("agency.txt", "r") as agency_file:
                 if partial is None:
                     self.agencies._load_file(agency_file)
@@ -81,11 +83,11 @@ class TransitData:
                 if partial is not None:
                     self.stops.clean()
 
-            if "translations.txt" in zip_file.namelist():
+            if "translations.txt" in zip_files_list:
                 with zip_file.open("translations.txt", "r") as translation_file:
                     self.translator._load_file(translation_file)
 
-            if "fare_attributes.txt" in zip_file.namelist() and "fare_rules.txt" in zip_file.namelist():
+            if "fare_attributes.txt" in zip_files_list and "fare_rules.txt" in zip_files_list:
                 with zip_file.open("fare_attributes.txt", "r") as fare_attributes_file:
                     self.fare_attributes._load_file(fare_attributes_file, ignore_errors=partial is not None)
                 with zip_file.open("fare_rules.txt", "r") as fare_rules_file:
@@ -103,8 +105,8 @@ class TransitData:
                 if partial is not None:
                     self.fare_attributes.clean()
             else:
-                assert "fare_attributes.txt" in zip_file.namelist()
-                assert "fare_rules.txt" in zip_file.namelist()
+                assert "fare_attributes.txt" in zip_files_list
+                assert "fare_rules.txt" in zip_files_list
 
             for inner_file in zip_file.filelist:
                 # TODO: collect this known files list on reading
