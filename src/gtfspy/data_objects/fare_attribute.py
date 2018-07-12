@@ -25,6 +25,14 @@ class FareAttribute:
 
         return self.attributes.get("transfer_duration", None)
 
+    @transfer_duration.setter
+    def transfer_duration(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["transfer_duration"] = value
+
     def get_csv_fields(self):
         return ["fare_id", "price", "currency_type", "payment_method", "transfers"] + self.attributes.keys()
 

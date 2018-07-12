@@ -2,7 +2,7 @@ import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_true_false, validate_yes_no_unknown
 
 
@@ -60,6 +60,14 @@ class Stop:
 
         return self.attributes.get("stop_code", None)
 
+    @stop_code.setter
+    def stop_code(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["stop_code"] = value
+
     @property
     def stop_desc(self):
         """
@@ -67,6 +75,14 @@ class Stop:
         """
 
         return self.attributes.get("stop_desc", None)
+
+    @stop_desc.setter
+    def stop_desc(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["stop_desc"] = value
 
     @property
     def zone_id(self):
@@ -76,6 +92,14 @@ class Stop:
 
         return self.attributes.get("zone_id", None)
 
+    @zone_id.setter
+    def zone_id(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["zone_id"] = value
+
     @property
     def stop_url(self):
         """
@@ -83,6 +107,14 @@ class Stop:
         """
 
         return self.attributes.get("stop_url", None)
+
+    @stop_url.setter
+    def stop_url(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["stop_url"] = value
 
     @property
     def is_central_station(self):
@@ -92,6 +124,14 @@ class Stop:
 
         return bool(self.attributes.get("location_type", False))
 
+    @is_central_station.setter
+    def is_central_station(self, value):
+        """
+        :type value: bool
+        """
+
+        self.attributes["location_type"] = int(value)
+
     @property
     def parent_station(self):
         """
@@ -99,6 +139,14 @@ class Stop:
         """
 
         return self.attributes.get("parent_station", None)
+
+    @parent_station.setter
+    def parent_station(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["parent_station"] = value
 
     @property
     def stop_timezone(self):
@@ -108,6 +156,14 @@ class Stop:
 
         return self.attributes.get("stop_timezone", None)
 
+    @stop_timezone.setter
+    def stop_timezone(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["stop_timezone"] = value
+
     @property
     def wheelchair_boarding(self):
         """
@@ -115,6 +171,14 @@ class Stop:
         """
 
         return parse_yes_no_unknown(self.attributes.get("wheelchair_boarding", None))
+
+    @wheelchair_boarding.setter
+    def wheelchair_boarding(self, value):
+        """
+        :type value: bool | None
+        """
+
+        self.attributes["wheelchair_boarding"] = yes_no_unknown_to_int(value)
 
     def get_csv_fields(self):
         return ["stop_id", "stop_name", "stop_lat", "stop_lon"] + self.attributes.keys()

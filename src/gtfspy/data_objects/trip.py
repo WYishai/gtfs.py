@@ -4,7 +4,7 @@ from operator import attrgetter
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 from sortedcontainers import SortedList
 
@@ -60,6 +60,10 @@ class Trip:
 
         return self.attributes.get("trip_headsign", None)
 
+    @trip_headsign.setter
+    def trip_headsign(self, value):
+        self.attributes["trip_headsign"] = value
+
     @property
     def trip_short_name(self):
         """
@@ -67,6 +71,10 @@ class Trip:
         """
 
         return self.attributes.get("trip_short_name", None)
+
+    @trip_short_name.setter
+    def trip_short_name(self, value):
+        self.attributes["trip_short_name"] = value
 
     @property
     def direction_id(self):
@@ -76,6 +84,10 @@ class Trip:
 
         return self.attributes.get("direction_id", None)
 
+    @direction_id.setter
+    def direction_id(self, value):
+        self.attributes["direction_id"] = value
+
     @property
     def block_id(self):
         """
@@ -83,6 +95,10 @@ class Trip:
         """
 
         return self.attributes.get("block_id", None)
+
+    @block_id.setter
+    def block_id(self, value):
+        self.attributes["block_id"] = value
 
     @property
     def shape(self):
@@ -92,6 +108,10 @@ class Trip:
 
         return self.attributes.get("shape_id", None)
 
+    @shape.setter
+    def shape(self, value):
+        self.attributes["shape_id"] = value
+
     @property
     def bikes_allowed(self):
         """
@@ -99,6 +119,10 @@ class Trip:
         """
 
         return parse_yes_no_unknown(self.attributes.get("bikes_allowed", None))
+
+    @bikes_allowed.setter
+    def bikes_allowed(self, value):
+        self.attributes["bikes_allowed"] = yes_no_unknown_to_int(value)
 
     @property
     def wheelchair_accessible(self):
@@ -108,6 +132,10 @@ class Trip:
 
         return parse_yes_no_unknown(self.attributes.get("wheelchair_accessible", None))
 
+    @wheelchair_accessible.setter
+    def wheelchair_accessible(self, value):
+        self.attributes["wheelchair_accessible"] = yes_no_unknown_to_int(value)
+
     @property
     def original_trip_id(self):
         """
@@ -115,6 +143,10 @@ class Trip:
         """
 
         return self.attributes.get("original_trip_id", None)
+
+    @original_trip_id.setter
+    def original_trip_id(self, value):
+        self.attributes["original_trip_id"] = value
 
     @property
     def start_time(self):

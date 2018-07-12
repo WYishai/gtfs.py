@@ -42,11 +42,35 @@ class StopTime:
 
     @property
     def allow_pickup(self):
+        """
+        :rtype: bool
+        """
+
         return not bool(self.attributes.get("pickup_type", 0))
+
+    @allow_pickup.setter
+    def allow_pickup(self, value):
+        """
+        :type value: bool
+        """
+
+        self.attributes["pickup_type"] = int(not value)
 
     @property
     def allow_drop_off(self):
+        """
+        :rtype: bool
+        """
+
         return not bool(self.attributes.get("drop_off_type", 0))
+
+    @allow_drop_off.setter
+    def allow_drop_off(self, value):
+        """
+        :type value: bool
+        """
+
+        self.attributes["drop_off_type"] = int(not value)
 
     @property
     def shape_dist_traveled(self):
@@ -56,6 +80,14 @@ class StopTime:
 
         return self.attributes.get("shape_dist_traveled", None)
 
+    @shape_dist_traveled.setter
+    def shape_dist_traveled(self, value):
+        """
+        :type value: float | None
+        """
+
+        self.attributes["shape_dist_traveled"] = value
+
     @property
     def stop_headsign(self):
         """
@@ -64,6 +96,14 @@ class StopTime:
 
         return self.attributes.get("stop_headsign", None)
 
+    @stop_headsign.setter
+    def stop_headsign(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["stop_headsign"] = value
+
     @property
     def timepoint(self):
         """
@@ -71,6 +111,14 @@ class StopTime:
         """
 
         return self.attributes.get("timepoint", None)
+
+    @timepoint.setter
+    def timepoint(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["timepoint"] = value
 
     def get_csv_fields(self):
         return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence"] + self.attributes.keys()

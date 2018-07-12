@@ -46,6 +46,14 @@ class Agency:
 
         return self.attributes.get("agency_lang", None)
 
+    @agency_lang.setter
+    def agency_lang(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["agency_lang"] = value
+
     @property
     def agency_phone(self):
         """
@@ -53,6 +61,14 @@ class Agency:
         """
 
         return self.attributes.get("agency_phone", None)
+
+    @agency_phone.setter
+    def agency_phone(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["agency_phone"] = value
 
     @property
     def agency_email(self):
@@ -62,6 +78,14 @@ class Agency:
 
         return self.attributes.get("agency_email", None)
 
+    @agency_email.setter
+    def agency_email(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["agency_email"] = value
+
     @property
     def agency_fare_url(self):
         """
@@ -69,6 +93,14 @@ class Agency:
         """
 
         return self.attributes.get("agency_fare_url", None)
+
+    @agency_fare_url.setter
+    def agency_fare_url(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["agency_fare_url"] = value
 
     def get_line(self, route):
         return self.lines.get_line(route)

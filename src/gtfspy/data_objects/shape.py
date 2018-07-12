@@ -31,6 +31,14 @@ class ShapePoint:
 
         return self.attributes.get("shape_dist_traveled", None)
 
+    @shape_dist_traveled.setter
+    def shape_dist_traveled(self, value):
+        """
+        :type value: float | None
+        """
+
+        self.attributes["shape_dist_traveled"] = value
+
     def validate(self, transit_data):
         # TODO: validate ShapePoint values
         pass

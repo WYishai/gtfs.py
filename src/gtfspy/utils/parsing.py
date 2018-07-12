@@ -16,3 +16,12 @@ def parse_yes_no_unknown(value):
     elif value == 2:
         return False
     return None
+
+
+def yes_no_unknown_to_int(value):
+    if value is None:
+        return None
+    elif value:
+        return 1
+    else:
+        return 2

@@ -44,6 +44,14 @@ class Service:
 
         return self.days_relevance[0]
 
+    @sunday.setter
+    def sunday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[0] = value
+
     @property
     def monday(self):
         """
@@ -51,6 +59,14 @@ class Service:
         """
 
         return self.days_relevance[1]
+
+    @monday.setter
+    def monday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[1] = value
 
     @property
     def tuesday(self):
@@ -60,6 +76,14 @@ class Service:
 
         return self.days_relevance[2]
 
+    @tuesday.setter
+    def tuesday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[2] = value
+
     @property
     def wednesday(self):
         """
@@ -67,6 +91,14 @@ class Service:
         """
 
         return self.days_relevance[3]
+
+    @wednesday.setter
+    def wednesday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[3] = value
 
     @property
     def thursday(self):
@@ -76,6 +108,14 @@ class Service:
 
         return self.days_relevance[4]
 
+    @thursday.setter
+    def thursday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[4] = value
+
     @property
     def friday(self):
         """
@@ -84,6 +124,14 @@ class Service:
 
         return self.days_relevance[5]
 
+    @friday.setter
+    def friday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[5] = value
+
     @property
     def saturday(self):
         """
@@ -91,6 +139,14 @@ class Service:
         """
 
         return self.days_relevance[6]
+
+    @saturday.setter
+    def saturday(self, value):
+        """
+        :type value: bool
+        """
+
+        self.days_relevance[6] = value
 
     def is_active_on(self, date):
         """

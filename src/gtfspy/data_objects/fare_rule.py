@@ -37,6 +37,14 @@ class FareRule:
 
         return self.attributes.get("route_id", None)
 
+    @route.setter
+    def route(self, value):
+        """
+        :type value: gtfspy.data_objects.Route | None
+        """
+
+        self.attributes["route_id"] = value
+
     @property
     def origin_id(self):
         """
@@ -44,6 +52,14 @@ class FareRule:
         """
 
         return self.attributes.get("origin_id", None)
+
+    @origin_id.setter
+    def origin_id(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["origin_id"] = value
 
     @property
     def destination_id(self):
@@ -53,6 +69,14 @@ class FareRule:
 
         return self.attributes.get("destination_id", None)
 
+    @destination_id.setter
+    def destination_id(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["destination_id"] = value
+
     @property
     def contains_id(self):
         """
@@ -60,6 +84,14 @@ class FareRule:
         """
 
         return self.attributes.get("contains_id", None)
+
+    @contains_id.setter
+    def contains_id(self, value):
+        """
+        :type value: int | None
+        """
+
+        self.attributes["contains_id"] = value
 
     def get_csv_fields(self):
         return ["fare_id"] + self.attributes.keys()

@@ -2,7 +2,7 @@ import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_yes_no_unknown
+from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 
 
@@ -51,6 +51,14 @@ class Route:
 
         return self.attributes.get("route_desc", None)
 
+    @route_desc.setter
+    def route_desc(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["route_desc"] = value
+
     @property
     def route_color(self):
         """
@@ -58,6 +66,14 @@ class Route:
         """
 
         return self.attributes.get("route_color", None)
+
+    @route_color.setter
+    def route_color(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["route_color"] = value
 
     @property
     def route_text_color(self):
@@ -67,6 +83,14 @@ class Route:
 
         return self.attributes.get("route_text_color", None)
 
+    @route_text_color.setter
+    def route_text_color(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["route_text_color"] = value
+
     @property
     def bikes_allowed(self):
         """
@@ -74,6 +98,14 @@ class Route:
         """
 
         return parse_yes_no_unknown(self.attributes.get("bikes_allowed", None))
+
+    @bikes_allowed.setter
+    def bikes_allowed(self, value):
+        """
+        :type value: bool | None
+        """
+
+        self.attributes["bikes_allowed"] = yes_no_unknown_to_int(value)
 
     @property
     def stops(self):
