@@ -246,13 +246,18 @@ class StopCollection(BaseGtfsObjectCollection):
             self._transit_data.clean()
 
     def clean(self):
-        to_clean = []
+        to_clean = set()
         for stop in self:
             if len(stop.stop_times) == 0:
-                to_clean.append(stop)
+                to_clean.add(stop.stop_id)
 
-        for stop in to_clean:
-            del self._objects[stop.stop_id]
+        for stop in self:
+            while stop.parent_station is not None and stop.stop_id not in to_clean and stop.parent_station in to_clean:
+                to_clean.remove(stop.parent_station)
+                stop = self[stop.parent_station]
+
+        for stop_id in to_clean:
+            del self._objects[stop_id]
 
     def _load_file(self, csv_file):
         if isinstance(csv_file, str):
