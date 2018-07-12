@@ -135,13 +135,20 @@ class FareRuleCollection:
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_fare_rule(self, **kwargs):
-        fare_rule = FareRule(transit_data=self._transit_data, **kwargs)
+    def add_fare_rule(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            fare_rule = FareRule(transit_data=self._transit_data, **kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(fare_rule):
+                return None
 
-        self._objects.append(fare_rule)
-        return fare_rule
+            self._transit_data._changed()
+
+            self._objects.append(fare_rule)
+            return fare_rule
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, fare_rule, recursive=False, clean_after=True):
         self._objects.remove(fare_rule)
@@ -158,14 +165,14 @@ class FareRuleCollection:
         for fare_rule in fare_rules_to_clean:
             self._objects.remove(fare_rule)
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
-            self._objects = [FareRule(transit_data=self._transit_data, **row) for row in reader
-                             if row["route_id"] in self._transit_data.routes]
+            for row in reader:
+                self.add_fare_rule(ignore_errors=ignore_errors, condition=filter, **row)
 
     def has_data(self):
         return len(self._objects) > 0

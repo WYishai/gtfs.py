@@ -198,14 +198,21 @@ class ServiceCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_service(self, **kwargs):
-        service = Service(**kwargs)
+    def add_service(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            service = Service(**kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(service):
+                return None
 
-        assert service.service_id not in self._objects
-        self._objects[service.service_id] = service
-        return service
+            self._transit_data._changed()
+
+            assert service.service_id not in self._objects
+            self._objects[service.service_id] = service
+            return service
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, service, recursive=False, clean_after=True):
         if not isinstance(service, Service):
@@ -234,14 +241,14 @@ class ServiceCollection(BaseGtfsObjectCollection):
         for service in to_clean:
             del self._objects[service.service_id]
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
-            self._objects = {service.service_id: service for service in
-                             (Service(**row) for row in reader)}
+            for row in reader:
+                self.add_service(ignore_errors=ignore_errors, condition=filter, **row)
 
     def validate(self):
         for i, obj in self._objects.iteritems():

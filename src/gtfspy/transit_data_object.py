@@ -32,34 +32,54 @@ class TransitData:
         self.has_changed = True
         self.is_validated = False
 
-    def load_gtfs_file(self, gtfs_file, validate=True):
+    def load_gtfs_file(self, gtfs_file, validate=True, partial=None):
         assert not self.has_changed
 
         with ZipFile(gtfs_file) as zip_file:
             with zip_file.open("agency.txt", "r") as agency_file:
-                self.agencies._load_file(agency_file)
+                if partial is None:
+                    self.agencies._load_file(agency_file)
+                else:
+                    self.agencies._load_file(agency_file, filter=lambda agency: agency.agency_id in partial)
 
             with zip_file.open("routes.txt", "r") as routes_file:
-                self.routes._load_file(routes_file)
+                if partial is None:
+                    self.routes._load_file(routes_file)
+                else:
+                    self.routes._load_file(routes_file,
+                                           ignore_errors=True,
+                                           filter=lambda route: route.line.line_number in partial[route.agency.agency_id])
+                    for agency in self.agencies:
+                        agency.lines.clean()
 
             with zip_file.open("shapes.txt", "r") as shapes_file:
-                self.shapes._load_file(shapes_file)
+                self.shapes._load_file(shapes_file, ignore_errors=partial is not None)
 
             with zip_file.open("calendar.txt", "r") as calendar_file:
-                self.calendar._load_file(calendar_file)
+                self.calendar._load_file(calendar_file, ignore_errors=partial is not None)
 
             with zip_file.open("trips.txt", "r") as trips_file:
-                self.trips._load_file(trips_file)
+                self.trips._load_file(trips_file, ignore_errors=partial is not None)
+                if partial is not None:
+                    self.shapes.clean()
+                    self.calendar.clean()
 
             with zip_file.open("stops.txt", "r") as stops_file:
-                self.stops._load_file(stops_file)
+                self.stops._load_file(stops_file, ignore_errors=partial is not None)
 
             with zip_file.open("stop_times.txt", "r") as stop_times_file:
                 reader = csv.DictReader(stop_times_file)
                 for row in reader:
-                    stop_time = StopTime(transit_data=self, **row)
-                    stop_time.trip.stop_times.add(stop_time)
-                    stop_time.stop.stop_times.append(stop_time)
+                    try:
+                        stop_time = StopTime(transit_data=self, **row)
+                        stop_time.trip.stop_times.add(stop_time)
+                        stop_time.stop.stop_times.append(stop_time)
+                    except:
+                        if partial is None:
+                            raise
+
+                if partial is not None:
+                    self.stops.clean()
 
             if "translations.txt" in zip_file.namelist():
                 with zip_file.open("translations.txt", "r") as translation_file:
@@ -67,9 +87,21 @@ class TransitData:
 
             if "fare_attributes.txt" in zip_file.namelist() and "fare_rules.txt" in zip_file.namelist():
                 with zip_file.open("fare_attributes.txt", "r") as fare_attributes_file:
-                    self.fare_attributes._load_file(fare_attributes_file)
+                    self.fare_attributes._load_file(fare_attributes_file, ignore_errors=partial is not None)
                 with zip_file.open("fare_rules.txt", "r") as fare_rules_file:
-                    self.fare_rules._load_file(fare_rules_file)
+                    if partial is None:
+                        self.fare_rules._load_file(fare_rules_file)
+                    else:
+                        zone_ids = {stop.zone_id for stop in self.stops}
+                        self.fare_rules._load_file(fare_rules_file,
+                                                   ignore_errors=True,
+                                                   filter=lambda fare_rule:
+                                                   fare_rule.origin_id is None or fare_rule.origin_id in zone_ids or
+                                                   fare_rule.destination_id is None or fare_rule.destination_id in zone_ids or
+                                                   fare_rule.contains_id is None or fare_rule.contains_id in zone_ids)
+
+                if partial is not None:
+                    self.fare_attributes.clean()
             else:
                 assert "fare_attributes.txt" in zip_file.namelist()
                 assert "fare_rules.txt" in zip_file.namelist()

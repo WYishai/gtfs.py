@@ -106,19 +106,26 @@ class ShapeCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_shape_point(self, **kwargs):
-        shape_id = int(kwargs.pop("shape_id"))
-        shape_point = ShapePoint(**kwargs)
+    def add_shape_point(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            shape_id = int(kwargs.pop("shape_id"))
+            shape_point = ShapePoint(**kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(shape_point):
+                return None
 
-        if shape_id not in self._objects:
-            shape = Shape(shape_id)
-            self._objects[shape_id] = shape
-        else:
-            shape = self[shape_id]
-        shape.shape_points.add(shape_point)
-        return shape_point
+            self._transit_data._changed()
+
+            if shape_id not in self._objects:
+                shape = Shape(shape_id)
+                self._objects[shape_id] = shape
+            else:
+                shape = self[shape_id]
+            shape.shape_points.add(shape_point)
+            return shape_point
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, shape, recursive=False, clean_after=True):
         if not isinstance(shape, Shape):
@@ -147,14 +154,14 @@ class ShapeCollection(BaseGtfsObjectCollection):
         for shape in to_clean:
             del self._objects[shape.shape_id]
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
             for row in reader:
-                self.add_shape_point(**row)
+                self.add_shape_point(ignore_errors=ignore_errors, condition=filter, **row)
 
     def save(self, csv_file):
         if isinstance(csv_file, str):

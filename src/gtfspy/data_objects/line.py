@@ -54,16 +54,21 @@ class LineCollection(BaseGtfsObjectCollection):
         else:
             line = self[line_number]
 
-        line.add_route(route)
-
         return line
 
-    def add_line(self, **kwargs):
-        line = Line(**kwargs)
+    def add_line(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            line = Line(**kwargs)
 
-        assert line.line_number not in self._objects
-        self._objects[line.line_number] = line
-        return line
+            if condition is not None and not condition(line):
+                return None
+
+            assert line.line_number not in self._objects
+            self._objects[line.line_number] = line
+            return line
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, line, recursive=False, clean_after=True):
         if not isinstance(line, Line):
@@ -85,7 +90,7 @@ class LineCollection(BaseGtfsObjectCollection):
     def clean(self):
         to_clean = []
         for line in self:
-            if next((route for route in line.routes.iterkeys()), None) is None:
+            if len(line.routes) == 0:
                 to_clean.append(line)
 
         for line in to_clean:

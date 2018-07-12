@@ -219,14 +219,21 @@ class StopCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_stop(self, **kwargs):
-        stop = Stop(transit_data=self._transit_data, **kwargs)
+    def add_stop(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            stop = Stop(transit_data=self._transit_data, **kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(stop):
+                return None
 
-        assert stop.stop_id not in self._objects
-        self._objects[stop.stop_id] = stop
-        return stop
+            self._transit_data._changed()
+
+            assert stop.stop_id not in self._objects
+            self._objects[stop.stop_id] = stop
+            return stop
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, stop, recursive=False, clean_after=True):
         if not isinstance(stop, Stop):
@@ -259,14 +266,14 @@ class StopCollection(BaseGtfsObjectCollection):
         for stop_id in to_clean:
             del self._objects[stop_id]
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
-            self._objects = {stop.stop_id: stop for stop in
-                             (Stop(transit_data=self._transit_data, **row) for row in reader)}
+            for row in reader:
+                self.add_stop(ignore_errors=ignore_errors, condition=filter, **row)
 
     def validate(self):
         for i, obj in self._objects.iteritems():

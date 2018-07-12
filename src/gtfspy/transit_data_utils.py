@@ -83,3 +83,9 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
             dome_file.close()
 
     return new_transit_data
+
+
+def load_partial_transit_data(gtfs_file, lines):
+    td = TransitData()
+    td.load_gtfs_file(gtfs_file, partial=lines)
+    return td

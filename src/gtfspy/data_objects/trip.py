@@ -253,15 +253,22 @@ class TripCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_trip(self, **kwargs):
-        trip = Trip(transit_data=self._transit_data, **kwargs)
+    def add_trip(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            trip = Trip(transit_data=self._transit_data, **kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(trip):
+                return None
 
-        assert trip.trip_id not in self._objects
-        self._objects[trip.trip_id] = trip
-        trip.route.trips.append(trip)
-        return trip
+            self._transit_data._changed()
+
+            assert trip.trip_id not in self._objects
+            self._objects[trip.trip_id] = trip
+            trip.route.trips.append(trip)
+            return trip
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, trip, recursive=False, clean_after=True):
         if not isinstance(trip, Trip):
@@ -272,7 +279,6 @@ class TripCollection(BaseGtfsObjectCollection):
         if recursive:
             for stop_time in trip.stop_times:
                 stop_time.stop.stop_times.remove(stop_time)
-
         else:
             assert len(trip.stop_times) == 0
 
@@ -290,16 +296,14 @@ class TripCollection(BaseGtfsObjectCollection):
         for trip in to_clean:
             del self._objects[trip.trip_id]
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
-            self._objects = {trip.trip_id: trip for trip in
-                             (Trip(transit_data=self._transit_data, **row) for row in reader)}
-            for trip in self:
-                trip.route.trips.append(trip)
+            for row in reader:
+                self.add_trip(ignore_errors=ignore_errors, condition=filter, **row)
 
     def validate(self):
         for i, obj in self._objects.iteritems():

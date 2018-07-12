@@ -182,14 +182,22 @@ class RouteCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_route(self, **kwargs):
-        route = Route(transit_data=self._transit_data, **kwargs)
+    def add_route(self, ignore_errors=False, condition=None, **kwargs):
+        try:
+            route = Route(transit_data=self._transit_data, **kwargs)
 
-        self._transit_data._changed()
+            if condition is not None and not condition(route):
+                return None
 
-        assert route.route_id not in self._objects
-        self._objects[route.route_id] = route
-        return route
+            self._transit_data._changed()
+
+            assert route.route_id not in self._objects
+            self._objects[route.route_id] = route
+            route.line.add_route(route)
+            return route
+        except:
+            if not ignore_errors:
+                raise
 
     def remove(self, route, recursive=False, clean_after=True):
         if not isinstance(route, Route):
@@ -222,14 +230,14 @@ class RouteCollection(BaseGtfsObjectCollection):
         for route in to_clean:
             del self._objects[route.route_id]
 
-    def _load_file(self, csv_file):
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
             with open(csv_file, "rb") as f:
-                self._load_file(f)
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
         else:
             reader = csv.DictReader(csv_file)
-            self._objects = {route.route_id: route for route in
-                             (Route(transit_data=self._transit_data, **row) for row in reader)}
+            for row in reader:
+                self.add_route(ignore_errors=ignore_errors, condition=filter, **row)
 
     def validate(self):
         for i, obj in self._objects.iteritems():
