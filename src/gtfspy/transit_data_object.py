@@ -1,6 +1,7 @@
 import os
+import shutil
+import tempfile
 import zipfile
-from cStringIO import StringIO
 from zipfile import ZipFile
 
 from gtfspy.data_objects import *
@@ -120,74 +121,66 @@ class TransitData:
             self.validate()
 
     def save(self, file_path, compression=zipfile.ZIP_DEFLATED, validate=True):
-        assert not os.path.exists(file_path)
-
         if validate:
             self.validate()
 
-        with ZipFile(file_path, mode="w", compression=compression) as zip_file:
-            dome_file = StringIO()
-            self.agencies.save(dome_file)
-            zip_file.writestr("agency.txt", dome_file.getvalue())
-            dome_file.close()
+        tempdir = tempfile.mkdtemp()
+        temp_gtfs_file_path = tempfile.mktemp(suffix=".zip")
 
-            dome_file = StringIO()
-            self.routes.save(dome_file)
-            zip_file.writestr("routes.txt", dome_file.getvalue())
-            dome_file.close()
+        try:
+            with open(os.path.join(tempdir, "agency.txt"), "wb") as f:
+                self.agencies.save(f)
 
-            dome_file = StringIO()
-            self.shapes.save(dome_file)
-            zip_file.writestr("shapes.txt", dome_file.getvalue())
-            dome_file.close()
+            with open(os.path.join(tempdir, "routes.txt"), "wb") as f:
+                self.routes.save(f)
 
-            dome_file = StringIO()
-            self.calendar.save(dome_file)
-            zip_file.writestr("calendar.txt", dome_file.getvalue())
-            dome_file.close()
+            with open(os.path.join(tempdir, "shapes.txt"), "wb") as f:
+                self.shapes.save(f)
 
-            dome_file = StringIO()
-            self.trips.save(dome_file)
-            zip_file.writestr("trips.txt", dome_file.getvalue())
-            dome_file.close()
+            with open(os.path.join(tempdir, "calendar.txt"), "wb") as f:
+                self.calendar.save(f)
 
-            dome_file = StringIO()
-            self.stops.save(dome_file)
-            zip_file.writestr("stops.txt", dome_file.getvalue())
-            dome_file.close()
+            with open(os.path.join(tempdir, "trips.txt"), "wb") as f:
+                self.trips.save(f)
+
+            with open(os.path.join(tempdir, "stops.txt"), "wb") as f:
+                self.stops.save(f)
 
             fields = []
             for trip in self.trips:
                 for stop_time in trip.stop_times:
                     fields += (field for field in stop_time.get_csv_fields() if field not in fields)
-            dome_file = StringIO()
-            writer = csv.DictWriter(dome_file, fieldnames=fields, restval=None)
-            writer.writeheader()
-            for trip in self.trips:
-                for stop_time in trip.stop_times:
-                    writer.writerow(stop_time.to_csv_line())
-            zip_file.writestr("stop_times.txt", dome_file.getvalue())
-            dome_file.close()
+            with open(os.path.join(tempdir, "stop_times.txt"), "wb") as f:
+                writer = csv.DictWriter(f, fieldnames=fields, restval=None)
+                writer.writeheader()
+                for trip in self.trips:
+                    for stop_time in trip.stop_times:
+                        writer.writerow(stop_time.to_csv_line())
 
             if self.translator.has_data():
-                dome_file = StringIO()
-                self.translator.save(dome_file)
-                zip_file.writestr("translations.txt", dome_file.getvalue())
-                dome_file.close()
+                with open(os.path.join(tempdir, "translations.txt"), "wb") as f:
+                    self.translator.save(f)
 
             if self.fare_rules.has_data():
-                dome_file = StringIO()
-                self.fare_attributes.save(dome_file)
-                zip_file.writestr("fare_attributes.txt", dome_file.getvalue())
-                dome_file.close()
+                with open(os.path.join(tempdir, "fare_attributes.txt"), "wb") as f:
+                    self.fare_attributes.save(f)
 
-                dome_file = StringIO()
-                self.fare_rules.save(dome_file)
-                zip_file.writestr("fare_rules.txt", dome_file.getvalue())
-                dome_file.close()
+                with open(os.path.join(tempdir, "fare_rules.txt"), "wb") as f:
+                    self.fare_rules.save(f)
 
             for file_name, file_data in self.unknown_files.iteritems():
-                zip_file.writestr(file_name, file_data.data)
+                with open(os.path.join(tempdir, file_name)) as f:
+                    f.write(file_data.data)
+
+            with ZipFile(temp_gtfs_file_path, mode="w", compression=compression) as zip_file:
+                for file_name in os.listdir(tempdir):
+                    zip_file.write(os.path.join(tempdir, file_name), arcname=file_name)
+            shutil.move(temp_gtfs_file_path, file_path)
+        finally:
+            if os.path.exists(tempdir) and os.path.isdir(tempdir):
+                shutil.rmtree(tempdir)
+            if os.path.exists(temp_gtfs_file_path) and not os.path.isdir(temp_gtfs_file_path):
+                os.remove(temp_gtfs_file_path)
 
     def add_agency(self, **kwargs):
         self.agencies.add_agency(**kwargs)
