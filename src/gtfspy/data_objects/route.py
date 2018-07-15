@@ -38,7 +38,10 @@ class Route:
         if not_none_or_empty(route_text_color):
             self.attributes["route_text_color"] = str(route_text_color)
         if not_none_or_empty(bikes_allowed):
-            self.attributes["bikes_allowed"] = int(bikes_allowed)
+            if isinstance(bikes_allowed, bool):
+                self.attributes["bikes_allowed"] = parse_yes_no_unknown(bikes_allowed)
+            else:
+                self.attributes["bikes_allowed"] = int(bikes_allowed)
 
         self.line = self.agency.get_line(self)
         self.trips = []

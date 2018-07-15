@@ -48,7 +48,10 @@ class Stop:
         if not_none_or_empty(stop_timezone):
             self.attributes["stop_timezone"] = str(stop_timezone)
         if not_none_or_empty(wheelchair_boarding):
-            self.attributes["wheelchair_boarding"] = int(wheelchair_boarding)
+            if isinstance(wheelchair_boarding, bool):
+                self.attributes["wheelchair_boarding"] = parse_yes_no_unknown(wheelchair_boarding)
+            else:
+                self.attributes["wheelchair_boarding"] = int(wheelchair_boarding)
 
         self.stop_times = []
 
