@@ -45,12 +45,12 @@ class Trip:
             self.attributes["shape_id"] = transit_data.shapes[int(shape_id)]
         if not_none_or_empty(bikes_allowed):
             if isinstance(bikes_allowed, bool):
-                self.attributes["bikes_allowed"] = parse_yes_no_unknown(bikes_allowed)
+                self.attributes["bikes_allowed"] = yes_no_unknown_to_int(bikes_allowed)
             else:
                 self.attributes["bikes_allowed"] = int(bikes_allowed)
         if not_none_or_empty(wheelchair_accessible):
             if isinstance(wheelchair_accessible, bool):
-                self.attributes["wheelchair_accessible"] = parse_yes_no_unknown(wheelchair_accessible)
+                self.attributes["wheelchair_accessible"] = yes_no_unknown_to_int(wheelchair_accessible)
             else:
                 self.attributes["wheelchair_accessible"] = int(wheelchair_accessible)
         if not_none_or_empty(original_trip_id):
