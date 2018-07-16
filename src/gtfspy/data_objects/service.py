@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime
+from datetime import datetime, date
 
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.parsing import parse_or_default, str_to_bool
@@ -11,8 +11,8 @@ class Service:
                  thursday=None, friday=None, saturday=None, **kwargs):
         """
         :type service_id: str | int
-        :type start_date: datetime | str
-        :type end_date: datetime | str
+        :type start_date: date | str
+        :type end_date: date | str
         :type sunday: str | bool | None
         :type monday: str | bool | None
         :type tuesday: str | bool | None
@@ -23,8 +23,8 @@ class Service:
         """
 
         self.service_id = int(service_id)
-        self.start_date = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, "%Y%m%d").date()
-        self.end_date = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, "%Y%m%d").date()
+        self.start_date = start_date if isinstance(start_date, date) else datetime.strptime(start_date, "%Y%m%d").date()
+        self.end_date = end_date if isinstance(end_date, date) else datetime.strptime(end_date, "%Y%m%d").date()
         sunday = parse_or_default(sunday, False, str_to_bool)
         monday = parse_or_default(monday, False, str_to_bool)
         tuesday = parse_or_default(tuesday, False, str_to_bool)
