@@ -241,11 +241,13 @@ class TransitData:
             if recursive:
                 self.add_route_object(trip.route, recursive=True)
                 self.add_service_object(trip.service, recursive=True)
-                self.add_shape_object(trip.shape, recursive=True)
+                if trip.shape is not None:
+                    self.add_shape_object(trip.shape, recursive=True)
             else:
                 assert trip.route.route_id in self.routes and trip.route == self.routes[trip.route.route_id]
                 assert trip.service.service_id in self.calendar and trip.service == self.calendar[trip.service.service_id]
-                assert trip.shape.shape_id in self.shapes and trip.shape == self.shapes[trip.shape.shape_id]
+                assert trip.shape is None or \
+                       (trip.shape.shape_id in self.shapes and trip.shape == self.shapes[trip.shape.shape_id])
             self.trips.add_trip(**trip.to_csv_line())
         else:
             assert trip == self.trips[trip.trip_id]
