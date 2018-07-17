@@ -288,6 +288,7 @@ class TripCollection(BaseGtfsObjectCollection):
         else:
             assert len(trip.stop_times) == 0
 
+        trip.route.trips.remove(trip)
         del self._objects[trip.trip_id]
 
         if clean_after:
@@ -300,6 +301,7 @@ class TripCollection(BaseGtfsObjectCollection):
                 to_clean.append(trip)
 
         for trip in to_clean:
+            trip.route.trips.remove(trip)
             del self._objects[trip.trip_id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):

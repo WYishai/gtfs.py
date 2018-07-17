@@ -219,6 +219,7 @@ class RouteCollection(BaseGtfsObjectCollection):
         else:
             assert len(route.trips) == 0
 
+        del route.line.routes[route.route_id]
         del self._objects[route.route_id]
 
         if clean_after:
@@ -227,10 +228,11 @@ class RouteCollection(BaseGtfsObjectCollection):
     def clean(self):
         to_clean = []
         for route in self:
-            if next((trip for trip in route.trips), None) is None:
+            if len(route.trips) == 0:
                 to_clean.append(route)
 
         for route in to_clean:
+            del route.line.routes[route.route_id]
             del self._objects[route.route_id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
