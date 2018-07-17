@@ -1,13 +1,13 @@
 import unittest
 
-from gtfspy import TransitData, clone_transit_data, create_partial_transit_data, load_partial_transit_data
-
 import constants
+from gtfspy import TransitData, clone_transit_data, create_partial_transit_data, load_partial_transit_data
+from test_utils.create_gtfs_object import create_full_transit_data
 
 
 class TestTransitDataUtils(unittest.TestCase):
     def test_clone(self):
-        td1 = TransitData(gtfs_file=constants.GTFS_TEST_FILE_PATH)
+        td1 = create_full_transit_data()
         td2 = clone_transit_data(td1)
         self.assertEqual(td1, td2)
 
