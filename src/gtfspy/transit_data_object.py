@@ -183,7 +183,7 @@ class TransitData:
                 os.remove(temp_gtfs_file_path)
 
     def add_agency(self, **kwargs):
-        self.agencies.add_agency(**kwargs)
+        return self.agencies.add_agency(**kwargs)
 
     def add_agency_object(self, agency, recursive=False):
         assert isinstance(agency, Agency)
@@ -194,7 +194,7 @@ class TransitData:
             assert agency == self.agencies[agency.agency_id]
 
     def add_route(self, **kwargs):
-        self.routes.add_route(**kwargs)
+        return self.routes.add_route(**kwargs)
 
     def add_route_object(self, route, recursive=False):
         assert isinstance(route, Route)
@@ -209,7 +209,7 @@ class TransitData:
             assert route == self.routes[route.route_id]
 
     def add_shape_point(self, **kwargs):
-        self.shapes.add_shape_point(**kwargs)
+        return self.shapes.add_shape_point(**kwargs)
 
     def add_shape_object(self, shape, recursive=False):
         assert isinstance(shape, Shape)
@@ -221,7 +221,7 @@ class TransitData:
             assert shape == self.shapes[shape.shape_id]
 
     def add_service(self, **kwargs):
-        self.calendar.add_service(**kwargs)
+        return self.calendar.add_service(**kwargs)
 
     def add_service_object(self, service, recursive=False):
         assert isinstance(service, Service)
@@ -232,7 +232,7 @@ class TransitData:
             assert service == self.calendar[service.service_id]
 
     def add_trip(self, **kwargs):
-        self.trips.add_trip(**kwargs)
+        return self.trips.add_trip(**kwargs)
 
     def add_trip_object(self, trip, recursive=False):
         assert isinstance(trip, Trip)
@@ -253,7 +253,7 @@ class TransitData:
             assert trip == self.trips[trip.trip_id]
 
     def add_stop(self, **kwargs):
-        self.stops.add_stop(**kwargs)
+        return self.stops.add_stop(**kwargs)
 
     def add_stop_object(self, stop, recursive=False):
         assert isinstance(stop, Stop)
@@ -290,10 +290,10 @@ class TransitData:
         else:
             assert stop_time.trip.trip_id in self.trips and stop_time.trip == self.trips[stop_time.trip.trip_id]
             assert stop_time.stop.stop_id in self.stops and stop_time.stop == self.stops[stop_time.stop.stop_id]
-        self.add_stop_time(**stop_time.to_csv_line())
+        return self.add_stop_time(**stop_time.to_csv_line())
 
     def add_fare_attribute(self, **kwargs):
-        self.fare_attributes.add_fare_attribute(**kwargs)
+        return self.fare_attributes.add_fare_attribute(**kwargs)
 
     def add_fare_attribute_object(self, fare_attribute, recursive=False):
         assert isinstance(fare_attribute, FareAttribute)
@@ -304,7 +304,7 @@ class TransitData:
             assert fare_attribute == self.fare_attributes[fare_attribute.fare_id]
 
     def add_fare_rule(self, **kwargs):
-        self.fare_rules.add_fare_rule(**kwargs)
+        return self.fare_rules.add_fare_rule(**kwargs)
 
     def add_fare_rule_object(self, fare_rule, recursive=False):
         assert isinstance(fare_rule, FareRule)
@@ -314,7 +314,7 @@ class TransitData:
         else:
             assert fare_rule.fare.fare_id in self.fare_attributes \
                    and fare_rule.fare == self.fare_attributes[fare_rule.fare.fare_id]
-        self.fare_rules.add_fare_rule(**fare_rule.to_csv_line())
+        return self.fare_rules.add_fare_rule(**fare_rule.to_csv_line())
 
     def clean(self):
         self.trips.clean()
