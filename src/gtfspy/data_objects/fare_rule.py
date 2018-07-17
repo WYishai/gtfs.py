@@ -149,6 +149,15 @@ class FareRuleCollection:
             if not ignore_errors:
                 raise
 
+    def add_fare_rule_object(self, fare_rule, recursive=False):
+        assert isinstance(fare_rule, FareRule)
+
+        if recursive:
+            self._transit_data.add_fare_attribute_object(fare_rule.fare, recursive=True)
+        else:
+            assert fare_rule.fare in self._transit_data.fare_attributes
+        return self.add_fare_rule(**fare_rule.to_csv_line())
+
     def remove(self, fare_rule, recursive=False, clean_after=True):
         self._objects.remove(fare_rule)
 

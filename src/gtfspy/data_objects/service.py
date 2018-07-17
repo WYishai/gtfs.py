@@ -214,6 +214,14 @@ class ServiceCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
+    def add_service_object(self, service, recursive=False):
+        assert isinstance(service, Service)
+
+        if service.id not in self:
+            self.add_service(**service.to_csv_line())
+        else:
+            assert service == self[service.id]
+
     def remove(self, service, recursive=False, clean_after=True):
         if not isinstance(service, Service):
             service = self[service]

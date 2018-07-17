@@ -202,6 +202,18 @@ class RouteCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
+    def add_route_object(self, route, recursive=False):
+        assert isinstance(route, Route)
+
+        if route.id not in self:
+            if recursive:
+                self._transit_data.add_agency_object(route.agency, recursive=True)
+            else:
+                assert route.agency in self._transit_data.agencies
+            self.add_route(**route.to_csv_line())
+        else:
+            assert route == self[route.id]
+
     def remove(self, route, recursive=False, clean_after=True):
         if not isinstance(route, Route):
             route = self[route]

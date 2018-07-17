@@ -276,6 +276,23 @@ class TripCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
+    def add_trip_object(self, trip, recursive=False):
+        assert isinstance(trip, Trip)
+
+        if trip.id not in self._transit_data.trips:
+            if recursive:
+                self._transit_data.add_route_object(trip.route, recursive=True)
+                self._transit_data.add_service_object(trip.service, recursive=True)
+                if trip.shape is not None:
+                    self._transit_data.add_shape_object(trip.shape, recursive=True)
+            else:
+                assert trip.route in self._transit_data.routes
+                assert trip.service in self._transit_data.calendar
+                assert trip.shape is None or trip.shape in self._transit_data.shapes
+            self.add_trip(**trip.to_csv_line())
+        else:
+            assert trip == self[trip.id]
+
     def remove(self, trip, recursive=False, clean_after=True):
         if not isinstance(trip, Trip):
             trip = self[trip]

@@ -158,6 +158,14 @@ class AgencyCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
+    def add_agency_object(self, agency, recursive=False):
+        assert isinstance(agency, Agency)
+
+        if agency.id not in self:
+            self.add_agency(**agency.to_csv_line())
+        else:
+            assert agency == self[agency.id]
+
     def remove(self, agency, recursive=False, clean_after=True):
         if not isinstance(agency, Agency):
             agency = self[agency]

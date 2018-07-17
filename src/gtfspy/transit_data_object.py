@@ -186,91 +186,37 @@ class TransitData:
         return self.agencies.add_agency(**kwargs)
 
     def add_agency_object(self, agency, recursive=False):
-        assert isinstance(agency, Agency)
-
-        if agency.agency_id not in self.agencies:
-            self.agencies.add_agency(**agency.to_csv_line())
-        else:
-            assert agency == self.agencies[agency.agency_id]
+        return self.agencies.add_agency_object(agency, recursive=recursive)
 
     def add_route(self, **kwargs):
         return self.routes.add_route(**kwargs)
 
     def add_route_object(self, route, recursive=False):
-        assert isinstance(route, Route)
-
-        if route.route_id not in self.routes:
-            if recursive:
-                self.add_agency_object(route.agency, recursive=True)
-            else:
-                assert route.agency.agency_id in self.agencies and route.agency == self.agencies[route.agency.agency_id]
-            self.routes.add_route(**route.to_csv_line())
-        else:
-            assert route == self.routes[route.route_id]
+        return self.routes.add_route_object(route, recursive=recursive)
 
     def add_shape_point(self, **kwargs):
         return self.shapes.add_shape_point(**kwargs)
 
     def add_shape_object(self, shape, recursive=False):
-        assert isinstance(shape, Shape)
-
-        if shape.shape_id not in self.shapes:
-            for row in shape.to_csv_line():
-                self.shapes.add_shape_point(**row)
-        else:
-            assert shape == self.shapes[shape.shape_id]
+        return self.shapes.add_shape_object(shape, recursive=recursive)
 
     def add_service(self, **kwargs):
         return self.calendar.add_service(**kwargs)
 
     def add_service_object(self, service, recursive=False):
-        assert isinstance(service, Service)
-
-        if service.service_id not in self.calendar:
-            self.calendar.add_service(**service.to_csv_line())
-        else:
-            assert service == self.calendar[service.service_id]
+        return self.calendar.add_service_object(service, recursive=recursive)
 
     def add_trip(self, **kwargs):
         return self.trips.add_trip(**kwargs)
 
     def add_trip_object(self, trip, recursive=False):
-        assert isinstance(trip, Trip)
-
-        if trip.trip_id not in self.trips:
-            if recursive:
-                self.add_route_object(trip.route, recursive=True)
-                self.add_service_object(trip.service, recursive=True)
-                if trip.shape is not None:
-                    self.add_shape_object(trip.shape, recursive=True)
-            else:
-                assert trip.route.route_id in self.routes and trip.route == self.routes[trip.route.route_id]
-                assert trip.service.service_id in self.calendar and trip.service == self.calendar[trip.service.service_id]
-                assert trip.shape is None or \
-                       (trip.shape.shape_id in self.shapes and trip.shape == self.shapes[trip.shape.shape_id])
-            self.trips.add_trip(**trip.to_csv_line())
-        else:
-            assert trip == self.trips[trip.trip_id]
+        return self.trips.add_trip_object(trip, recursive=recursive)
 
     def add_stop(self, **kwargs):
         return self.stops.add_stop(**kwargs)
 
     def add_stop_object(self, stop, recursive=False):
-        assert isinstance(stop, Stop)
-
-        if stop.stop_id not in self.stops:
-            if stop.parent_station is not None:
-                if recursive:
-                    # TODO: add when we are changing stop.parent_station to be a Stop object
-                    # self.add_stop_object(stop.parent_station, recursive=True)
-                    pass
-                else:
-                    assert stop.parent_station in self.stops
-                    # TODO: change to this condition when we are changing stop.parent_station to be a Stop object
-                    # assert stop.parent_station.stop_id in self.stops and stop.parent_station == self.stops[stop.parent_station.stop_id]
-            self.stops.add_stop(**stop.to_csv_line())
-        else:
-            assert stop == self.stops[stop.stop_id]
+        return self.stops.add_stop_object(stop, recursive=recursive)
 
     def add_stop_time(self, **kwargs):
         stop_time = StopTime(transit_data=self, **kwargs)
@@ -288,33 +234,21 @@ class TransitData:
             self.add_trip_object(stop_time.trip, recursive=True)
             self.add_stop_object(stop_time.stop, recursive=True)
         else:
-            assert stop_time.trip.trip_id in self.trips and stop_time.trip == self.trips[stop_time.trip.trip_id]
-            assert stop_time.stop.stop_id in self.stops and stop_time.stop == self.stops[stop_time.stop.stop_id]
+            assert stop_time.trip in self.trips
+            assert stop_time.stop in self.stops
         return self.add_stop_time(**stop_time.to_csv_line())
 
     def add_fare_attribute(self, **kwargs):
         return self.fare_attributes.add_fare_attribute(**kwargs)
 
     def add_fare_attribute_object(self, fare_attribute, recursive=False):
-        assert isinstance(fare_attribute, FareAttribute)
-
-        if fare_attribute.fare_id not in self.fare_attributes:
-            self.fare_attributes.add_fare_attribute(**fare_attribute.to_csv_line())
-        else:
-            assert fare_attribute == self.fare_attributes[fare_attribute.fare_id]
+        return self.fare_attributes.add_fare_attribute_object(fare_attribute, recursive=recursive)
 
     def add_fare_rule(self, **kwargs):
         return self.fare_rules.add_fare_rule(**kwargs)
 
     def add_fare_rule_object(self, fare_rule, recursive=False):
-        assert isinstance(fare_rule, FareRule)
-
-        if recursive:
-            self.add_fare_attribute_object(fare_rule.fare, recursive=True)
-        else:
-            assert fare_rule.fare.fare_id in self.fare_attributes \
-                   and fare_rule.fare == self.fare_attributes[fare_rule.fare.fare_id]
-        return self.fare_rules.add_fare_rule(**fare_rule.to_csv_line())
+        return self.fare_rules.add_fare_rule_object(fare_rule, recursive=recursive)
 
     def clean(self):
         self.trips.clean()
