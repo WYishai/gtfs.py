@@ -15,9 +15,9 @@ class TestTransitDataUtils(unittest.TestCase):
         lines = {15: ["58", "358", "458"]}
         td1 = TransitData(gtfs_file=constants.GTFS_TEST_FILE_PATH)
         td2 = create_partial_transit_data(td1, lines)
-        self.assertEqual(sorted(agency.agency_id for agency in td2.agencies), sorted(lines.iterkeys()))
+        self.assertEqual(sorted(agency.id for agency in td2.agencies), sorted(lines.iterkeys()))
         for agency in td2.agencies:
-            self.assertEqual(sorted(lines[agency.agency_id]), sorted(line.line_number for line in agency.lines))
+            self.assertEqual(sorted(lines[agency.id]), sorted(line.line_number for line in agency.lines))
 
     def test_load_partial(self):
         lines = {15: ["58", "358", "458"]}

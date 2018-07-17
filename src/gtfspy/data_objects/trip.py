@@ -28,7 +28,7 @@ class Trip:
         :type original_trip_id: str | None
         """
 
-        self.trip_id = trip_id
+        self.id = trip_id
         self.route = transit_data.routes[route_id]
         self.service = transit_data.calendar[int(service_id)]
 
@@ -204,7 +204,7 @@ class Trip:
         if stop_id is None:
             stop_time = self.stop_times[0]
         else:
-            stop_time = (st for st in self.stop_times if st.stop.stop_id == stop_id).next()
+            stop_time = (st for st in self.stop_times if st.stop.id == id).next()
 
         i = from_date
         day_interval = timedelta(days=1)
@@ -217,13 +217,13 @@ class Trip:
         return ["trip_id", "route_id", "service_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(trip_id=self.trip_id,
-                      route_id=self.route.route_id,
-                      service_id=self.service.service_id,
+        result = dict(trip_id=self.id,
+                      route_id=self.route.id,
+                      service_id=self.service.id,
                       **self.attributes)
 
         if "shape_id" in result:
-            result["shape_id"] = self.shape.shape_id
+            result["shape_id"] = self.shape.id
 
         return result
 
@@ -232,9 +232,9 @@ class Trip:
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        assert transit_data.routes[self.route.route_id] is self.route
-        assert transit_data.calendar[self.service.service_id] is self.service
-        assert self.shape is None or transit_data.shapes[self.shape.shape_id] is self.shape
+        assert transit_data.routes[self.route.id] is self.route
+        assert transit_data.calendar[self.service.id] is self.service
+        assert self.shape is None or transit_data.shapes[self.shape.id] is self.shape
         assert validate_yes_no_unknown(self.attributes.get("bikes_allowed", None))
         assert validate_yes_no_unknown(self.attributes.get("wheelchair_accessible", None))
 
@@ -245,7 +245,7 @@ class Trip:
         if not isinstance(other, Trip):
             return False
 
-        return self.trip_id == other.trip_id and self.route == other.route and self.service == other.service and \
+        return self.id == other.id and self.route == other.route and self.service == other.service and \
                self.attributes == other.attributes
 
     def __ne__(self, other):
@@ -254,7 +254,7 @@ class Trip:
 
 class TripCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Trip)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -268,8 +268,8 @@ class TripCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert trip.trip_id not in self._objects
-            self._objects[trip.trip_id] = trip
+            assert trip.id not in self._objects
+            self._objects[trip.id] = trip
             trip.route.trips.append(trip)
             return trip
         except:
@@ -280,7 +280,7 @@ class TripCollection(BaseGtfsObjectCollection):
         if not isinstance(trip, Trip):
             trip = self[trip]
         else:
-            assert self[trip.trip_id] is trip
+            assert self[trip.id] is trip
 
         if recursive:
             for stop_time in trip.stop_times:
@@ -289,7 +289,7 @@ class TripCollection(BaseGtfsObjectCollection):
             assert len(trip.stop_times) == 0
 
         trip.route.trips.remove(trip)
-        del self._objects[trip.trip_id]
+        del self._objects[trip.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -302,7 +302,7 @@ class TripCollection(BaseGtfsObjectCollection):
 
         for trip in to_clean:
             trip.route.trips.remove(trip)
-            del self._objects[trip.trip_id]
+            del self._objects[trip.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -312,8 +312,3 @@ class TripCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.add_trip(ignore_errors=ignore_errors, condition=filter, **row)
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.trip_id
-            obj.validate(self._transit_data)

@@ -22,7 +22,7 @@ class Service:
         :type saturday: str | bool | None
         """
 
-        self.service_id = int(service_id)
+        self.id = int(service_id)
         self.start_date = start_date if isinstance(start_date, date) else datetime.strptime(start_date, "%Y%m%d").date()
         self.end_date = end_date if isinstance(end_date, date) else datetime.strptime(end_date, "%Y%m%d").date()
         sunday = parse_or_default(sunday, False, str_to_bool)
@@ -160,7 +160,7 @@ class Service:
                 "friday", "saturday"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return dict(service_id=self.service_id,
+        return dict(service_id=self.id,
                     start_date=self.start_date.strftime("%Y%m%d"),
                     end_date=self.end_date.strftime("%Y%m%d"),
                     sunday=int(self.sunday),
@@ -183,7 +183,7 @@ class Service:
         if not isinstance(other, Service):
             return False
 
-        return self.service_id == other.service_id and self.start_date == other.start_date and \
+        return self.id == other.id and self.start_date == other.start_date and \
                self.end_date == other.end_date and self.days_relevance == other.days_relevance and \
                self.attributes == other.attributes
 
@@ -193,7 +193,7 @@ class Service:
 
 class ServiceCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Service)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -207,8 +207,8 @@ class ServiceCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert service.service_id not in self._objects
-            self._objects[service.service_id] = service
+            assert service.id not in self._objects
+            self._objects[service.id] = service
             return service
         except:
             if not ignore_errors:
@@ -218,7 +218,7 @@ class ServiceCollection(BaseGtfsObjectCollection):
         if not isinstance(service, Service):
             service = self[service]
         else:
-            assert self[service.service_id] is service
+            assert self[service.id] is service
 
         if recursive:
             for trip in self._transit_data.trips:
@@ -227,7 +227,7 @@ class ServiceCollection(BaseGtfsObjectCollection):
         else:
             assert next((trip for trip in self._transit_data.trips if trip.service is service), None) is None
 
-        del self._objects[service.service_id]
+        del self._objects[service.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -239,7 +239,7 @@ class ServiceCollection(BaseGtfsObjectCollection):
                 to_clean.append(service)
 
         for service in to_clean:
-            del self._objects[service.service_id]
+            del self._objects[service.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -249,8 +249,3 @@ class ServiceCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.add_service(ignore_errors=ignore_errors, condition=filter, **row)
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.service_id
-            obj.validate(self._transit_data)

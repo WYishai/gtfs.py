@@ -26,7 +26,7 @@ class Stop:
         :type wheelchair_boarding: str | int | None
         """
 
-        self.stop_id = int(stop_id)
+        self.id = int(stop_id)
         self.stop_name = stop_name
         self.stop_lat = float(stop_lat)
         self.stop_lon = float(stop_lon)
@@ -187,7 +187,7 @@ class Stop:
         return ["stop_id", "stop_name", "stop_lat", "stop_lon"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(stop_id=self.stop_id,
+        result = dict(stop_id=self.id,
                       stop_name=self.stop_name,
                       stop_lat=self.stop_lat,
                       stop_lon=self.stop_lon,
@@ -207,7 +207,7 @@ class Stop:
         if not isinstance(other, Stop):
             return False
 
-        return self.stop_id == other.stop_id and self.stop_name == other.stop_name and \
+        return self.id == other.id and self.stop_name == other.stop_name and \
                self.stop_lat == other.stop_lat and self.stop_lon == other.stop_lon and \
                self.attributes == other.attributes
 
@@ -217,7 +217,7 @@ class Stop:
 
 class StopCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Stop)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -231,8 +231,8 @@ class StopCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert stop.stop_id not in self._objects
-            self._objects[stop.stop_id] = stop
+            assert stop.id not in self._objects
+            self._objects[stop.id] = stop
             return stop
         except:
             if not ignore_errors:
@@ -242,7 +242,7 @@ class StopCollection(BaseGtfsObjectCollection):
         if not isinstance(stop, Stop):
             stop = self[stop]
         else:
-            assert self[stop.stop_id] is stop
+            assert self[stop.id] is stop
 
         if recursive:
             for stop_time in stop.stop_times:
@@ -250,7 +250,7 @@ class StopCollection(BaseGtfsObjectCollection):
         else:
             assert len(stop.stop_times) == 0
 
-        del self._objects[stop.stop_id]
+        del self._objects[stop.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -259,10 +259,10 @@ class StopCollection(BaseGtfsObjectCollection):
         to_clean = set()
         for stop in self:
             if len(stop.stop_times) == 0:
-                to_clean.add(stop.stop_id)
+                to_clean.add(stop.id)
 
         for stop in self:
-            while stop.parent_station is not None and stop.stop_id not in to_clean and stop.parent_station in to_clean:
+            while stop.parent_station is not None and stop.id not in to_clean and stop.parent_station in to_clean:
                 to_clean.remove(stop.parent_station)
                 stop = self[stop.parent_station]
 
@@ -277,8 +277,3 @@ class StopCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.add_stop(ignore_errors=ignore_errors, condition=filter, **row)
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.stop_id
-            obj.validate(self._transit_data)

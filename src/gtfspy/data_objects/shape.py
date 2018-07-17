@@ -63,7 +63,7 @@ class Shape:
         :type shape_id: str | int
         """
 
-        self.shape_id = int(shape_id)
+        self.id = int(shape_id)
 
         self.shape_points = SortedList(key=attrgetter("shape_pt_sequence"))
 
@@ -73,7 +73,7 @@ class Shape:
 
     def to_csv_line(self):
         for shape_point in self.shape_points:
-            result = dict(shape_id=self.shape_id,
+            result = dict(shape_id=self.id,
                           shape_pt_lat=shape_point.shape_pt_lat,
                           shape_pt_lon=shape_point.shape_pt_lon,
                           shape_pt_sequence=shape_point.shape_pt_sequence,
@@ -93,7 +93,7 @@ class Shape:
         if not isinstance(other, Shape):
             return False
 
-        return self.shape_id == other.shape_id and self.shape_points == other.shape_points
+        return self.id == other.id and self.shape_points == other.shape_points
 
     def __ne__(self, other):
         return not (self == other)
@@ -101,7 +101,7 @@ class Shape:
 
 class ShapeCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Shape)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -131,7 +131,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
         if not isinstance(shape, Shape):
             shape = self[shape]
         else:
-            assert self[shape.shape_id] is shape
+            assert self[shape.id] is shape
 
         if recursive:
             for trip in self._transit_data.trips:
@@ -140,7 +140,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
         else:
             assert next((trip for trip in self._transit_data.trips if trip.shape is shape), None) is None
 
-        del self._objects[shape.shape_id]
+        del self._objects[shape.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -152,7 +152,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
                 to_clean.append(shape)
 
         for shape in to_clean:
-            del self._objects[shape.shape_id]
+            del self._objects[shape.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -176,8 +176,3 @@ class ShapeCollection(BaseGtfsObjectCollection):
             writer.writeheader()
             for obj in self:
                 writer.writerows(obj.to_csv_line())
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.shape_id
-            obj.validate(self._transit_data)

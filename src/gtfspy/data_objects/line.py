@@ -16,9 +16,13 @@ class Line:
 
         self.routes = {}
 
+    @property
+    def id(self):
+        return self.line_number
+
     def add_route(self, route):
         # TODO: check if the route id exists
-        self.routes[route.route_id] = route
+        self.routes[route.id] = route
 
     def get_trips_calendar(self, from_date, to_date=None, sort=True):
         res = itertools.chain.from_iterable(route.get_trips_calendar(from_date, to_date=to_date, sort=False)
@@ -35,12 +39,12 @@ class Line:
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        assert transit_data.agencies[self.agency.agency_id] is self.agency
+        assert transit_data.agencies[self.agency.id] is self.agency
 
 
 class LineCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, agency):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Line)
         self._agency = agency
 
     def get_line(self, route):
@@ -95,8 +99,3 @@ class LineCollection(BaseGtfsObjectCollection):
 
         for line in to_clean:
             del self._objects[line.line_number]
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.line_number
-            obj.validate(self._transit_data)

@@ -21,7 +21,7 @@ class Agency:
         :type agency_fare_url: str | None
         """
 
-        self.agency_id = int(agency_id)
+        self.id = int(agency_id)
         self.agency_name = agency_name
         self.agency_url = agency_url
         self.agency_timezone = agency_timezone
@@ -109,7 +109,7 @@ class Agency:
         return ["agency_id", "agency_name", "agency_url", "agency_timezone"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(agency_id=self.agency_id,
+        result = dict(agency_id=self.id,
                       agency_name=self.agency_name,
                       agency_url=self.agency_url,
                       agency_timezone=self.agency_timezone,
@@ -127,7 +127,7 @@ class Agency:
         if not isinstance(other, Agency):
             return False
 
-        return self.agency_id == other.agency_id and self.agency_name == other.agency_name and \
+        return self.id == other.id and self.agency_name == other.agency_name and \
                self.agency_url == other.agency_url and self.agency_timezone == other.agency_timezone and \
                self.attributes == other.attributes
 
@@ -137,7 +137,7 @@ class Agency:
 
 class AgencyCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Agency)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -151,8 +151,8 @@ class AgencyCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert agency.agency_id not in self._objects
-            self._objects[agency.agency_id] = agency
+            assert agency.id not in self._objects
+            self._objects[agency.id] = agency
             return agency
         except:
             if not ignore_errors:
@@ -162,7 +162,7 @@ class AgencyCollection(BaseGtfsObjectCollection):
         if not isinstance(agency, Agency):
             agency = self[agency]
         else:
-            assert self[agency.agency_id] is agency
+            assert self[agency.id] is agency
 
         if recursive:
             for line in list(agency.lines):
@@ -171,7 +171,7 @@ class AgencyCollection(BaseGtfsObjectCollection):
             for line in agency.lines:
                 assert len(line.routes) == 0
 
-        del self._objects[agency.agency_id]
+        del self._objects[agency.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -183,7 +183,7 @@ class AgencyCollection(BaseGtfsObjectCollection):
                 to_clean.append(agency)
 
         for agency in to_clean:
-            del self._objects[agency.agency_id]
+            del self._objects[agency.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -193,8 +193,3 @@ class AgencyCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.add_agency(ignore_errors=ignore_errors, condition=filter, **row)
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.agency_id
-            obj.validate(self._transit_data)

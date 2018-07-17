@@ -22,7 +22,7 @@ class Route:
         :type bikes_allowed: str | int | bool | None
         """
 
-        self.route_id = route_id
+        self.id = route_id
         self.route_short_name = route_short_name
         self.route_long_name = route_long_name
         # TODO: create dedicated object to route type
@@ -149,11 +149,11 @@ class Route:
         return ["route_id", "route_short_name", "route_long_name", "route_type", "agency_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(route_id=self.route_id,
+        result = dict(route_id=self.id,
                       route_short_name=self.route_short_name,
                       route_long_name=self.route_long_name,
                       route_type=self.route_type,
-                      agency_id=self.agency.agency_id,
+                      agency_id=self.agency.id,
                       **self.attributes)
         return result
 
@@ -162,7 +162,7 @@ class Route:
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        assert transit_data.agencies[self.agency.agency_id] is self.agency
+        assert transit_data.agencies[self.agency.id] is self.agency
         assert self.route_type in xrange(0, 8)
         assert validate_yes_no_unknown(self.attributes.get("bikes_allowed", None))
 
@@ -170,7 +170,7 @@ class Route:
         if not isinstance(other, Route):
             return False
 
-        return self.route_id == other.route_id and self.route_short_name == other.route_short_name and \
+        return self.id == other.id and self.route_short_name == other.route_short_name and \
                self.route_long_name == other.route_long_name and self.route_type == other.route_type and \
                self.agency == other.agency and self.attributes == other.attributes
 
@@ -180,7 +180,7 @@ class Route:
 
 class RouteCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, Route)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -194,8 +194,8 @@ class RouteCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert route.route_id not in self._objects
-            self._objects[route.route_id] = route
+            assert route.id not in self._objects
+            self._objects[route.id] = route
             route.line.add_route(route)
             return route
         except:
@@ -206,7 +206,7 @@ class RouteCollection(BaseGtfsObjectCollection):
         if not isinstance(route, Route):
             route = self[route]
         else:
-            assert self[route.route_id] is route
+            assert self[route.id] is route
 
         if recursive:
             for trip in route.trips:
@@ -219,8 +219,8 @@ class RouteCollection(BaseGtfsObjectCollection):
         else:
             assert len(route.trips) == 0
 
-        del route.line.routes[route.route_id]
-        del self._objects[route.route_id]
+        del route.line.routes[route.id]
+        del self._objects[route.id]
 
         if clean_after:
             self._transit_data.clean()
@@ -232,8 +232,8 @@ class RouteCollection(BaseGtfsObjectCollection):
                 to_clean.append(route)
 
         for route in to_clean:
-            del route.line.routes[route.route_id]
-            del self._objects[route.route_id]
+            del route.line.routes[route.id]
+            del self._objects[route.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -243,8 +243,3 @@ class RouteCollection(BaseGtfsObjectCollection):
             reader = csv.DictReader(csv_file)
             for row in reader:
                 self.add_route(ignore_errors=ignore_errors, condition=filter, **row)
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.route_id
-            obj.validate(self._transit_data)

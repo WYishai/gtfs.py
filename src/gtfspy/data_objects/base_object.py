@@ -5,12 +5,13 @@ import gtfspy
 
 
 class BaseGtfsObjectCollection(object):
-    def __init__(self, transit_data):
+    def __init__(self, transit_data, objects_type):
         """
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
         self._transit_data = transit_data
+        self._objects_type = objects_type
         self._objects = {}
 
     def save(self, csv_file):
@@ -26,6 +27,11 @@ class BaseGtfsObjectCollection(object):
             writer.writeheader()
             writer.writerows(obj.to_csv_line() for obj in self)
 
+    def validate(self):
+        for i, obj in self._objects.iteritems():
+            assert i == obj.id
+            obj.validate(self._transit_data)
+
     def __len__(self):
         return len(self._objects)
 
@@ -36,7 +42,10 @@ class BaseGtfsObjectCollection(object):
         return self._objects.itervalues()
 
     def __contains__(self, item):
-        return item in self._objects
+        if isinstance(item, self._objects_type):
+            return item.id in self._objects and item == self._objects[item.id]
+        else:
+            return item in self._objects
 
     def __eq__(self, other):
         if not isinstance(other, BaseGtfsObjectCollection):

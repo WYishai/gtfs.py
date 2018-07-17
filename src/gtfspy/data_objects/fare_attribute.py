@@ -7,7 +7,7 @@ from gtfspy.utils.validating import not_none_or_empty
 
 class FareAttribute:
     def __init__(self, fare_id, price, currency_type, payment_method, transfers, transfer_duration=None, **kwargs):
-        self.fare_id = fare_id
+        self.id = fare_id
         self.price = float(price)
         self.currency_type = currency_type
         self.payment_method = int(payment_method)
@@ -37,7 +37,7 @@ class FareAttribute:
         return ["fare_id", "price", "currency_type", "payment_method", "transfers"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return dict(fare_id=self.fare_id,
+        return dict(fare_id=self.id,
                     price="%.2f" % (self.price,),
                     currency_type=self.currency_type,
                     payment_method=self.payment_method,
@@ -59,7 +59,7 @@ class FareAttribute:
         if not isinstance(other, FareAttribute):
             return False
 
-        return self.fare_id == other.fare_id and self.price == other.price and \
+        return self.id == other.id and self.price == other.price and \
                self.currency_type == other.currency_type and self.payment_method == other.payment_method and \
                self.transfers == other.transfers and self.attributes == other.attributes
 
@@ -69,7 +69,7 @@ class FareAttribute:
 
 class FareAttributeCollection(BaseGtfsObjectCollection):
     def __init__(self, transit_data, csv_file=None):
-        BaseGtfsObjectCollection.__init__(self, transit_data)
+        BaseGtfsObjectCollection.__init__(self, transit_data, FareAttribute)
 
         if csv_file is not None:
             self._load_file(csv_file)
@@ -83,8 +83,8 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
 
             self._transit_data._changed()
 
-            assert fare_attribute.fare_id not in self._objects
-            self._objects[fare_attribute.fare_id] = fare_attribute
+            assert fare_attribute.id not in self._objects
+            self._objects[fare_attribute.id] = fare_attribute
             return fare_attribute
         except:
             if not ignore_errors:
@@ -94,7 +94,7 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
         if not isinstance(fare_attribute, FareAttribute):
             fare_attribute = self[fare_attribute]
         else:
-            assert self[fare_attribute.fare_id] is fare_attribute
+            assert self[fare_attribute.id] is fare_attribute
 
         if recursive:
             fare_rules_to_clean = [fare_rule for fare_rule in self._transit_data.fare_rules
@@ -105,17 +105,17 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
             assert next((fare_rule for fare_rule in self._transit_data.fare_rules if fare_rule.fare is fare_attribute),
                         None) is None
 
-        del self._objects[fare_attribute.fare_id]
+        del self._objects[fare_attribute.id]
 
         if clean_after:
             self._transit_data.clean()
 
     def clean(self):
-        fares_with_rules = {fare_rule.fare.fare_id for fare_rule in self._transit_data.fare_rules}
-        to_clean = [fare_attribute for fare_attribute in self if fare_attribute.fare_id not in fares_with_rules]
+        fares_with_rules = {fare_rule.fare.id for fare_rule in self._transit_data.fare_rules}
+        to_clean = [fare_attribute for fare_attribute in self if fare_attribute.id not in fares_with_rules]
 
         for fare_attribute in to_clean:
-            del self._objects[fare_attribute.fare_id]
+            del self._objects[fare_attribute.id]
 
     def _load_file(self, csv_file, ignore_errors=False, filter=None):
         if isinstance(csv_file, str):
@@ -128,8 +128,3 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
 
     def has_data(self):
         return len(self._objects) > 0
-
-    def validate(self):
-        for i, obj in self._objects.iteritems():
-            assert i == obj.fare_id
-            obj.validate(self._transit_data)

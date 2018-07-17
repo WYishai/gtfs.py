@@ -124,10 +124,10 @@ class StopTime:
         return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(trip_id=self.trip.trip_id,
+        result = dict(trip_id=self.trip.id,
                       arrival_time=str_timedelta(self.arrival_time),
                       departure_time=str_timedelta(self.departure_time),
-                      stop_id=self.stop.stop_id,
+                      stop_id=self.stop.id,
                       stop_sequence=self.stop_sequence,
                       **self.attributes)
         return result
@@ -137,8 +137,8 @@ class StopTime:
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        assert transit_data.trips[self.trip.trip_id] is self.trip
-        assert transit_data.stops[self.stop.stop_id] is self.stop
+        assert transit_data.trips[self.trip.id] is self.trip
+        assert transit_data.stops[self.stop.id] is self.stop
 
         assert self.allow_pickup or self.allow_drop_off
         assert validate_true_false(self.attributes.get("pickup_type", 0))

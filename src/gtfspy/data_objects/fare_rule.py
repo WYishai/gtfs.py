@@ -97,11 +97,10 @@ class FareRule:
         return ["fare_id"] + self.attributes.keys()
 
     def to_csv_line(self):
-        result = dict(fare_id=self.fare.fare_id,
-                      **self.attributes)
+        result = dict(fare_id=self.fare.id, **self.attributes)
 
         if "route_id" in result:
-            result["route_id"] = self.route.route_id
+            result["route_id"] = self.route.id
 
         return result
 
@@ -110,14 +109,14 @@ class FareRule:
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
-        assert transit_data.fare_attributes[self.fare.fare_id] is self.fare
-        assert self.route is None or transit_data.routes[self.route.route_id] is self.route
+        assert transit_data.fare_attributes[self.fare.id] is self.fare
+        assert self.route is None or transit_data.routes[self.route.id] is self.route
 
     def __eq__(self, other):
         if not isinstance(other, FareRule):
             return False
 
-        return self.fare.fare_id == other.fare.fare_id and self.attributes == other.attributes
+        return self.fare.id == other.fare.id and self.attributes == other.attributes
 
     def __ne__(self, other):
         return not (self == other)
@@ -160,7 +159,7 @@ class FareRuleCollection:
         zone_ids = {stop.zone_id for stop in self._transit_data.stops}
         fare_rules_to_clean = [fare_rule for fare_rule in self
                                if (fare_rule.route is not None
-                                   and fare_rule.route.route_id not in self._transit_data.routes)
+                                   and fare_rule.route.id not in self._transit_data.routes)
                                or (fare_rule.origin_id is not None and fare_rule.origin_id not in zone_ids)
                                or (fare_rule.destination_id is not None and fare_rule.destination_id not in zone_ids)
                                or (fare_rule.contains_id is not None and fare_rule.contains_id not in zone_ids)]
