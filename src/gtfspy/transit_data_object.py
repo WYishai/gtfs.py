@@ -99,9 +99,9 @@ class TransitData:
                         self.fare_rules._load_file(fare_rules_file,
                                                    ignore_errors=True,
                                                    filter=lambda fare_rule:
-                                                   fare_rule.origin_id is None or fare_rule.origin_id in zone_ids or
-                                                   fare_rule.destination_id is None or fare_rule.destination_id in zone_ids or
-                                                   fare_rule.contains_id is None or fare_rule.contains_id in zone_ids)
+                                                   (fare_rule.origin_id is None or fare_rule.origin_id in zone_ids) and
+                                                   (fare_rule.destination_id is None or fare_rule.destination_id in zone_ids) and
+                                                   (fare_rule.contains_id is None or fare_rule.contains_id in zone_ids))
 
                 if partial is not None:
                     self.fare_attributes.clean()
