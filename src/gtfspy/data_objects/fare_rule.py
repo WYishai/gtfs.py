@@ -159,7 +159,9 @@ class FareRuleCollection:
     def clean(self):
         zone_ids = {stop.zone_id for stop in self._transit_data.stops}
         fare_rules_to_clean = [fare_rule for fare_rule in self
-                               if (fare_rule.origin_id is not None and fare_rule.origin_id not in zone_ids)
+                               if (fare_rule.route is not None
+                                   and fare_rule.route.route_id not in self._transit_data.routes)
+                               or (fare_rule.origin_id is not None and fare_rule.origin_id not in zone_ids)
                                or (fare_rule.destination_id is not None and fare_rule.destination_id not in zone_ids)
                                or (fare_rule.contains_id is not None and fare_rule.contains_id not in zone_ids)]
         for fare_rule in fare_rules_to_clean:
