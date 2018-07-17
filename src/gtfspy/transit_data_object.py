@@ -43,7 +43,7 @@ class TransitData:
                 if partial is None:
                     self.agencies._load_file(agency_file)
                 else:
-                    self.agencies._load_file(agency_file, filter=lambda agency: agency.agency_id in partial)
+                    self.agencies._load_file(agency_file, filter=lambda agency: agency.id in partial)
 
             with zip_file.open("routes.txt", "r") as routes_file:
                 if partial is None:
@@ -51,7 +51,7 @@ class TransitData:
                 else:
                     self.routes._load_file(routes_file,
                                            ignore_errors=True,
-                                           filter=lambda route: route.line.line_number in partial[route.agency.agency_id])
+                                           filter=lambda route: route.line.line_number in partial[route.agency.id])
                     for agency in self.agencies:
                         agency.lines.clean()
 
@@ -349,9 +349,9 @@ class TransitData:
                 self.calendar == other.calendar and self.shapes == other.shapes and self.stops == other.stops and \
                 self.fare_attributes == other.fare_attributes and self.fare_rules == other.fare_rules:
             for trip in self.trips:
-                if len(trip.stop_times) != len(other.trips[trip.trip_id].stop_times):
+                if len(trip.stop_times) != len(other.trips[trip.id].stop_times):
                     return False
-                for self_stop_time, other_stop_time in zip(trip.stop_times, other.trips[trip.trip_id].stop_times):
+                for self_stop_time, other_stop_time in zip(trip.stop_times, other.trips[trip.id].stop_times):
                     if self_stop_time != other_stop_time:
                         return False
 

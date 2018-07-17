@@ -69,7 +69,7 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
 
     for fare_rule in transit_data.fare_rules:
         zone_ids = {stop.zone_id for stop in new_transit_data.stops}
-        if (fare_rule.route is None or fare_rule.route.route_id in new_transit_data.routes) and \
+        if (fare_rule.route is None or fare_rule.route.id in new_transit_data.routes) and \
                 (fare_rule.origin_id is None or fare_rule.origin_id in zone_ids) and \
                 (fare_rule.destination_id is None or fare_rule.destination_id in zone_ids) and \
                 (fare_rule.contains_id is None or fare_rule.contains_id in zone_ids):
