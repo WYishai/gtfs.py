@@ -43,8 +43,7 @@ class Stop:
         if not_none_or_empty(location_type):
             self.attributes["location_type"] = int(location_type)
         if not_none_or_empty(parent_station):
-            # TODO: save the station object instead of the id
-            self.attributes["parent_station"] = int(parent_station)
+            self.attributes["parent_station"] = transit_data.stops[int(parent_station)]
         if not_none_or_empty(stop_timezone):
             self.attributes["stop_timezone"] = str(stop_timezone)
         if not_none_or_empty(wheelchair_boarding):
@@ -138,7 +137,7 @@ class Stop:
     @property
     def parent_station(self):
         """
-        :rtype: int | None
+        :rtype: Stop | None
         """
 
         return self.attributes.get("parent_station", None)
@@ -146,7 +145,7 @@ class Stop:
     @parent_station.setter
     def parent_station(self, value):
         """
-        :type value: int | None
+        :type value: Stop | None
         """
 
         self.attributes["parent_station"] = value
@@ -192,6 +191,10 @@ class Stop:
                       stop_lat=self.stop_lat,
                       stop_lon=self.stop_lon,
                       **self.attributes)
+
+        if "parent_station" in result:
+            result["parent_station"] = self.parent_station.id
+
         return result
 
     def validate(self, transit_data):
@@ -244,13 +247,9 @@ class StopCollection(BaseGtfsObjectCollection):
         if stop.id not in self:
             if stop.parent_station is not None:
                 if recursive:
-                    # TODO: add when we are changing stop.parent_station to be a Stop object
-                    # self.add_stop_object(stop.parent_station, recursive=True)
-                    pass
+                    self.add_stop_object(stop.parent_station, recursive=True)
                 else:
                     assert stop.parent_station in self
-                    # TODO: change to this condition when we are changing stop.parent_station to be a Stop object
-                    # assert stop.parent_station in self.stops
             self.add_stop(**stop.to_csv_line())
         else:
             assert stop == self[stop.id]
@@ -279,9 +278,10 @@ class StopCollection(BaseGtfsObjectCollection):
                 to_clean.add(stop.id)
 
         for stop in self:
-            while stop.parent_station is not None and stop.id not in to_clean and stop.parent_station in to_clean:
-                to_clean.remove(stop.parent_station)
-                stop = self[stop.parent_station]
+            while stop.parent_station is not None and stop.id not in to_clean:
+                stop = stop.parent_station
+                if stop.id in to_clean:
+                    to_clean.remove(stop.id)
 
         for stop_id in to_clean:
             del self._objects[stop_id]

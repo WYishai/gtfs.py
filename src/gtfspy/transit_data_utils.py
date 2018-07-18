@@ -63,7 +63,7 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
                         for stop_time in trip.stop_times:
                             stop = stop_time.stop
                             if stop.parent_station is not None:
-                                new_transit_data.add_stop_object(transit_data.stops[stop.parent_station])
+                                new_transit_data.add_stop_object(stop.parent_station)
                             new_transit_data.add_stop_object(stop)
                             new_transit_data.add_stop_time_object(stop_time)
 
