@@ -7,7 +7,7 @@ from zipfile import ZipFile
 from gtfspy.data_objects import *
 
 
-class TransitData:
+class TransitData(object):
     def __init__(self, gtfs_file=None, validate=True):
         self.agencies = AgencyCollection(self)
         self.routes = RouteCollection(self)

@@ -1,9 +1,10 @@
 import csv
 from operator import attrgetter
 
+from sortedcontainers import SortedList
+
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.validating import not_none_or_empty
-from sortedcontainers import SortedList
 
 
 class ShapePoint(object):

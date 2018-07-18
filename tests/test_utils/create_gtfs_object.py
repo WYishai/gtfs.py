@@ -40,8 +40,9 @@ def create_full_transit_data():
                    wednesday=False, thursday=False, friday=False, saturday=False, test_attribute="service test data")
 
     td.add_agency(agency_id=1, agency_name="agency name 1", agency_url="http://www.agencyname1.com/",
-                  agency_timezone="Asia/Jerusalem", agency_phone="+972-2-1234567", agency_email="agencyname1@host.com",
-                  agency_fare_url="http://www.agencyname1.com/fare", test_attribute="test data 1")
+                  agency_timezone="Asia/Jerusalem", agency_lang="HE", agency_phone="+972-2-1234567",
+                  agency_email="agencyname1@host.com", agency_fare_url="http://www.agencyname1.com/fare",
+                  test_attribute="test data 1")
     td.add_agency(agency_id=30, agency_name="agency name 30", agency_url="https://www.agencyname30.com/",
                   agency_timezone="Asia/Jerusalem", agency_phone="*1234", agency_email="mail@agencyname30.com",
                   agency_fare_url="https://www.agencyname30.com/fare")
@@ -67,7 +68,6 @@ def create_full_transit_data():
                 trip_short_name="trip 30001_1 short name", direction_id=1, block_id=1, bikes_allowed=True,
                 wheelchair_accessible=True, original_trip_id="30001_1 origin", test_attribute="trip test data")
 
-    # trip_id, arrival_time, departure_time, stop_id, stop_sequence, pickup_type=None, drop_off_type=None, shape_dist_traveled=None, stop_headsign=None, timepoint=None
     td.add_stop_time(trip_id="1001_1", arrival_time=timedelta(hours=6), departure_time=timedelta(hours=6, minutes=5),
                      stop_id=10001, stop_sequence=0, drop_off_type=1, shape_dist_traveled=0)
     td.add_stop_time(trip_id="1001_1", arrival_time=timedelta(hours=7), departure_time=timedelta(hours=7),

@@ -2,11 +2,12 @@ import csv
 from datetime import datetime, date, time, timedelta
 from operator import attrgetter
 
+from sortedcontainers import SortedList
+
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
-from sortedcontainers import SortedList
 
 
 class Trip(object):

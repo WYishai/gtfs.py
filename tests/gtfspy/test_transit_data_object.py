@@ -2,9 +2,8 @@ import os
 import tempfile
 import unittest
 
-from gtfspy import TransitData
-
 import constants
+from gtfspy import TransitData
 from test_utils.gtfs_utils import compare_gtfs_files
 
 
