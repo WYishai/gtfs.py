@@ -6,7 +6,7 @@ from gtfspy.data_objects.line import LineCollection
 from gtfspy.utils.validating import not_none_or_empty
 
 
-class Agency:
+class Agency(object):
     def __init__(self, transit_data, agency_id, agency_name, agency_url, agency_timezone, agency_lang=None,
                  agency_phone=None, agency_email=None, agency_fare_url=None, **kwargs):
         """

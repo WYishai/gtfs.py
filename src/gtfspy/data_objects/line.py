@@ -4,7 +4,7 @@ import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 
 
-class Line:
+class Line(object):
     def __init__(self, agency, line_number):
         """
         :type agency: gtfspy.data_objects.agency.Agency

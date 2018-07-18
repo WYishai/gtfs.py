@@ -9,7 +9,7 @@ from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 from sortedcontainers import SortedList
 
 
-class Trip:
+class Trip(object):
     def __init__(self, transit_data, trip_id, route_id, service_id, trip_headsign=None, trip_short_name=None,
                  direction_id=None, block_id=None, shape_id=None, bikes_allowed=None, wheelchair_accessible=None,
                  original_trip_id=None, **kwargs):

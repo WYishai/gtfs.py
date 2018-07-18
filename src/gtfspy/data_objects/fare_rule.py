@@ -5,7 +5,7 @@ import gtfspy
 from gtfspy.utils.validating import not_none_or_empty
 
 
-class FareRule:
+class FareRule(object):
     def __init__(self, transit_data, fare_id, route_id=None, origin_id=None, destination_id=None, contains_id=None,
                  **kwargs):
         """

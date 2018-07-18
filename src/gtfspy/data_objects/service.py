@@ -6,7 +6,7 @@ from gtfspy.utils.parsing import parse_or_default, str_to_bool
 from gtfspy.utils.validating import not_none_or_empty
 
 
-class Service:
+class Service(object):
     def __init__(self, service_id, start_date, end_date, sunday=None, monday=None, tuesday=None, wednesday=None,
                  thursday=None, friday=None, saturday=None, **kwargs):
         """

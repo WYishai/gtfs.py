@@ -6,7 +6,7 @@ from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 
 
-class Route:
+class Route(object):
     def __init__(self, transit_data, route_id, route_short_name, route_long_name, route_type, agency_id,
                  route_desc=None, route_color=None, route_text_color=None, bikes_allowed=None, **kwargs):
         """

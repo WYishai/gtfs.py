@@ -6,7 +6,7 @@ from gtfspy.utils.validating import not_none_or_empty
 from sortedcontainers import SortedList
 
 
-class ShapePoint:
+class ShapePoint(object):
     def __init__(self, shape_pt_lat, shape_pt_lon, shape_pt_sequence, shape_dist_traveled=None, **kwargs):
         """
         :type shape_pt_lat: str | float

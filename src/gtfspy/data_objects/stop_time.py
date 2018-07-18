@@ -5,7 +5,7 @@ from gtfspy.utils.time import parse_timedelta, str_timedelta
 from gtfspy.utils.validating import not_none_or_empty, validate_true_false
 
 
-class StopTime:
+class StopTime(object):
     def __init__(self, transit_data, trip_id, arrival_time, departure_time, stop_id, stop_sequence, pickup_type=None,
                  drop_off_type=None, shape_dist_traveled=None, stop_headsign=None, timepoint=None, **kwargs):
         """

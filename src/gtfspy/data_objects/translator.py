@@ -2,7 +2,7 @@ import csv
 from collections import defaultdict
 
 
-class Translator:
+class Translator(object):
     def __init__(self, csv_file=None, data=None):
         self._words = defaultdict(dict)
 

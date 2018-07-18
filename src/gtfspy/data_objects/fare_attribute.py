@@ -5,7 +5,7 @@ from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.validating import not_none_or_empty
 
 
-class FareAttribute:
+class FareAttribute(object):
     def __init__(self, fare_id, price, currency_type, payment_method, transfers, transfer_duration=None, **kwargs):
         self.id = fare_id
         self.price = float(price)

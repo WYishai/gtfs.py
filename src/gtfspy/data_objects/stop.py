@@ -6,7 +6,7 @@ from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_true_false, validate_yes_no_unknown
 
 
-class Stop:
+class Stop(object):
     def __init__(self, transit_data, stop_id, stop_name, stop_lat, stop_lon, stop_code=None, stop_desc=None,
                  zone_id=None, stop_url=None, location_type=None, parent_station=None, stop_timezone=None,
                  wheelchair_boarding=None, **kwargs):
