@@ -137,8 +137,11 @@ class ShapeCollection(BaseGtfsObjectCollection):
         if shape.id not in self:
             for row in shape.to_csv_line():
                 self.add_shape_point(**row)
+            return self[shape.id]
         else:
-            assert shape == self[shape.id]
+            old_shape = self[shape.id]
+            assert shape == old_shape
+            return old_shape
 
     def remove(self, shape, recursive=False, clean_after=True):
         if not isinstance(shape, Shape):

@@ -98,9 +98,11 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
         assert isinstance(fare_attribute, FareAttribute)
 
         if fare_attribute.id not in self:
-            self.add_fare_attribute(**fare_attribute.to_csv_line())
+            return self.add_fare_attribute(**fare_attribute.to_csv_line())
         else:
-            assert fare_attribute == self[fare_attribute.id]
+            old_fare_attribute = self[fare_attribute.id]
+            assert fare_attribute == old_fare_attribute
+            return old_fare_attribute
 
     def remove(self, fare_attribute, recursive=False, clean_after=True):
         if not isinstance(fare_attribute, FareAttribute):

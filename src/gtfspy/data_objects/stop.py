@@ -254,9 +254,11 @@ class StopCollection(BaseGtfsObjectCollection):
                     self.add_stop_object(stop.parent_station, recursive=True)
                 else:
                     assert stop.parent_station in self
-            self.add_stop(**stop.to_csv_line())
+            return self.add_stop(**stop.to_csv_line())
         else:
-            assert stop == self[stop.id]
+            old_stop = self[stop.id]
+            assert stop == old_stop
+            return old_stop
 
     def remove(self, stop, recursive=False, clean_after=True):
         if not isinstance(stop, Stop):

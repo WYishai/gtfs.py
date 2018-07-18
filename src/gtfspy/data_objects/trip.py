@@ -293,9 +293,11 @@ class TripCollection(BaseGtfsObjectCollection):
                 assert trip.route in self._transit_data.routes
                 assert trip.service in self._transit_data.calendar
                 assert trip.shape is None or trip.shape in self._transit_data.shapes
-            self.add_trip(**trip.to_csv_line())
+            return self.add_trip(**trip.to_csv_line())
         else:
-            assert trip == self[trip.id]
+            old_trip = self[trip.id]
+            assert trip == old_trip
+            return old_trip
 
     def remove(self, trip, recursive=False, clean_after=True):
         if not isinstance(trip, Trip):

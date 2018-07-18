@@ -166,9 +166,11 @@ class AgencyCollection(BaseGtfsObjectCollection):
         assert isinstance(agency, Agency)
 
         if agency.id not in self:
-            self.add_agency(**agency.to_csv_line())
+            return self.add_agency(**agency.to_csv_line())
         else:
-            assert agency == self[agency.id]
+            old_agency = self[agency.id]
+            assert agency == old_agency
+            return old_agency
 
     def remove(self, agency, recursive=False, clean_after=True):
         if not isinstance(agency, Agency):

@@ -222,9 +222,11 @@ class ServiceCollection(BaseGtfsObjectCollection):
         assert isinstance(service, Service)
 
         if service.id not in self:
-            self.add_service(**service.to_csv_line())
+            return self.add_service(**service.to_csv_line())
         else:
-            assert service == self[service.id]
+            old_service = self[service.id]
+            assert service == old_service
+            return old_service
 
     def remove(self, service, recursive=False, clean_after=True):
         if not isinstance(service, Service):
