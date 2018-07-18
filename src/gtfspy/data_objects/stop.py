@@ -26,7 +26,7 @@ class Stop(object):
         :type wheelchair_boarding: str | int | None
         """
 
-        self.id = int(stop_id)
+        self._id = int(stop_id)
         self.stop_name = stop_name
         self.stop_lat = float(stop_lat)
         self.stop_lon = float(stop_lon)
@@ -53,6 +53,10 @@ class Stop(object):
                 self.attributes["wheelchair_boarding"] = int(wheelchair_boarding)
 
         self.stop_times = []
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def stop_code(self):

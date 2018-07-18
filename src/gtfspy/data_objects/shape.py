@@ -63,9 +63,13 @@ class Shape:
         :type shape_id: str | int
         """
 
-        self.id = int(shape_id)
+        self._id = int(shape_id)
 
         self.shape_points = SortedList(key=attrgetter("shape_pt_sequence"))
+
+    @property
+    def id(self):
+        return self._id
 
     def get_csv_fields(self):
         return ["shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence"] + \

@@ -21,7 +21,7 @@ class Agency(object):
         :type agency_fare_url: str | None
         """
 
-        self.id = int(agency_id)
+        self._id = int(agency_id)
         self.agency_name = agency_name
         self.agency_url = agency_url
         self.agency_timezone = agency_timezone
@@ -37,6 +37,10 @@ class Agency(object):
             self.attributes["agency_fare_url"] = str(agency_fare_url)
 
         self.lines = LineCollection(transit_data, self)
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def agency_lang(self):

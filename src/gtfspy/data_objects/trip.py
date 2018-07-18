@@ -28,7 +28,7 @@ class Trip(object):
         :type original_trip_id: str | None
         """
 
-        self.id = trip_id
+        self._id = trip_id
         self.route = transit_data.routes[route_id]
         self.service = transit_data.calendar[int(service_id)]
 
@@ -57,6 +57,10 @@ class Trip(object):
             self.attributes["original_trip_id"] = str(original_trip_id)
 
         self.stop_times = SortedList(key=attrgetter("stop_sequence"))
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def trip_headsign(self):

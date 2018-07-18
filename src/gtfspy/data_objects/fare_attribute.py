@@ -7,7 +7,7 @@ from gtfspy.utils.validating import not_none_or_empty
 
 class FareAttribute(object):
     def __init__(self, fare_id, price, currency_type, payment_method, transfers, transfer_duration=None, **kwargs):
-        self.id = fare_id
+        self._id = fare_id
         self.price = float(price)
         self.currency_type = currency_type
         self.payment_method = int(payment_method)
@@ -16,6 +16,10 @@ class FareAttribute(object):
         self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
         if not_none_or_empty(transfer_duration):
             self.attributes["transfer_duration"] = int(transfer_duration)
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def transfer_duration(self):

@@ -22,7 +22,7 @@ class Service(object):
         :type saturday: str | bool | None
         """
 
-        self.id = int(service_id)
+        self._id = int(service_id)
         self.start_date = start_date if isinstance(start_date, date) else datetime.strptime(start_date, "%Y%m%d").date()
         self.end_date = end_date if isinstance(end_date, date) else datetime.strptime(end_date, "%Y%m%d").date()
         sunday = parse_or_default(sunday, False, str_to_bool)
@@ -35,6 +35,10 @@ class Service(object):
         self.days_relevance = [sunday, monday, tuesday, wednesday, thursday, friday, saturday]
 
         self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def sunday(self):

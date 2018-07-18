@@ -22,7 +22,7 @@ class Route(object):
         :type bikes_allowed: str | int | bool | None
         """
 
-        self.id = route_id
+        self._id = route_id
         self.route_short_name = route_short_name
         self.route_long_name = route_long_name
         # TODO: create dedicated object to route type
@@ -45,6 +45,10 @@ class Route(object):
 
         self.line = self.agency.get_line(self)
         self.trips = []
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def route_desc(self):
