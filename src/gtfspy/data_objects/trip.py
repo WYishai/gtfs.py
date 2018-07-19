@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, date, time, timedelta
+from datetime import date, time, timedelta
 from operator import attrgetter
 
 from sortedcontainers import SortedList
@@ -197,11 +197,8 @@ class Trip(object):
         :type stop_id: int
         """
 
-        from_date = datetime.combine(from_date, time())
         if to_date is None:
             to_date = from_date
-        else:
-            to_date = datetime.combine(to_date, time())
 
         assert from_date <= to_date
 
