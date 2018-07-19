@@ -181,7 +181,8 @@ class Service(object):
         :type transit_data: transit_data_object.TransitData
         """
 
-        pass
+        assert self.start_date <= self.end_date
+        assert True in self.days_relevance
 
     def __eq__(self, other):
         if not isinstance(other, Service):
