@@ -190,11 +190,12 @@ class Trip(object):
 
         return self.stops[-1]
 
-    def get_trip_calendar(self, from_date, to_date=None, stop_id=None):
+    def get_trip_calendar(self, from_date, to_date=None, stop_sequence=None, stop_id=None):
         """
         :type from_date: date
         :type to_date: date | None
-        :type stop_id: int
+        :type stop_sequence: int | None
+        :type stop_id: int | None
         """
 
         if to_date is None:
@@ -203,10 +204,12 @@ class Trip(object):
         assert from_date <= to_date
 
         stop_time = None
-        if stop_id is None:
-            stop_time = self.stop_times[0]
+        if stop_sequence is not None:
+            stop_time = (st for st in self.stop_times if st.stop_sequence == stop_sequence).next()
+        elif stop_id is not None:
+            stop_time = (st for st in self.stop_times if st.stop.id == stop_id).next()
         else:
-            stop_time = (st for st in self.stop_times if st.stop.id == id).next()
+            stop_time = self.stop_times[0]
 
         i = from_date
         day_interval = timedelta(days=1)
