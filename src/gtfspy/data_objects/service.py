@@ -51,10 +51,10 @@ class Service(object):
     @sunday.setter
     def sunday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[0] = value
+        self.days_relevance[0] = bool(value)
 
     @property
     def monday(self):
@@ -67,10 +67,10 @@ class Service(object):
     @monday.setter
     def monday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[1] = value
+        self.days_relevance[1] = bool(value)
 
     @property
     def tuesday(self):
@@ -83,10 +83,10 @@ class Service(object):
     @tuesday.setter
     def tuesday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[2] = value
+        self.days_relevance[2] = bool(value)
 
     @property
     def wednesday(self):
@@ -99,10 +99,10 @@ class Service(object):
     @wednesday.setter
     def wednesday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[3] = value
+        self.days_relevance[3] = bool(value)
 
     @property
     def thursday(self):
@@ -115,10 +115,10 @@ class Service(object):
     @thursday.setter
     def thursday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[4] = value
+        self.days_relevance[4] = bool(value)
 
     @property
     def friday(self):
@@ -131,10 +131,10 @@ class Service(object):
     @friday.setter
     def friday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[5] = value
+        self.days_relevance[5] = bool(value)
 
     @property
     def saturday(self):
@@ -147,10 +147,10 @@ class Service(object):
     @saturday.setter
     def saturday(self, value):
         """
-        :type value: bool
+        :type value: bool | int
         """
 
-        self.days_relevance[6] = value
+        self.days_relevance[6] = bool(value)
 
     def is_active_on(self, date):
         """
