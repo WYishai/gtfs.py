@@ -58,7 +58,7 @@ class ShapePoint(object):
         return not (self == other)
 
 
-class Shape:
+class Shape(object):
     def __init__(self, shape_id):
         """
         :type shape_id: str | int
