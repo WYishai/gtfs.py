@@ -1,6 +1,6 @@
 import csv
 from cStringIO import StringIO
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 from gtfspy import TransitData
 from gtfspy.data_objects import UnknownFile
@@ -25,19 +25,15 @@ def create_full_transit_data():
     td.add_shape_point(shape_id=1, shape_pt_lat=td.stops[20000].stop_lat, shape_pt_lon=td.stops[20000].stop_lon,
                        shape_pt_sequence=1, shape_dist_traveled=None, test_attribute="shape test data")
 
-    td.add_service(service_id=1, start_date=datetime.now().date(),
-                   end_date=(datetime.now() + timedelta(weeks=8)).date(), sunday=True, monday=True, tuesday=True,
-                   wednesday=True, thursday=True)
-    td.add_service(service_id=2, start_date=datetime.now().date(),
-                   end_date=(datetime.now() + timedelta(weeks=8)).date(), sunday=True, monday=True, tuesday=True,
-                   wednesday=True, thursday=True, friday=True)
-    td.add_service(service_id=3, start_date=datetime.now().date(),
-                   end_date=(datetime.now() + timedelta(weeks=8)).date(), friday=True)
-    td.add_service(service_id=4, start_date=datetime.now().date(),
-                   end_date=(datetime.now() + timedelta(weeks=8)).date(), saturday=True)
-    td.add_service(service_id=5, start_date=datetime.now().date(),
-                   end_date=(datetime.now() + timedelta(weeks=8)).date(), sunday=True, monday=False, tuesday=False,
-                   wednesday=False, thursday=False, friday=False, saturday=False, test_attribute="service test data")
+    td.add_service(service_id=1, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), sunday=True,
+                   monday=True, tuesday=True, wednesday=True, thursday=True)
+    td.add_service(service_id=2, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), sunday=True,
+                   monday=True, tuesday=True, wednesday=True, thursday=True, friday=True)
+    td.add_service(service_id=3, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), friday=True)
+    td.add_service(service_id=4, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), saturday=True)
+    td.add_service(service_id=5, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), sunday=True,
+                   monday=False, tuesday=False, wednesday=False, thursday=False, friday=False, saturday=False,
+                   test_attribute="service test data")
 
     td.add_agency(agency_id=1, agency_name="agency name 1", agency_url="http://www.agencyname1.com/",
                   agency_timezone="Asia/Jerusalem", agency_lang="HE", agency_phone="+972-2-1234567",
