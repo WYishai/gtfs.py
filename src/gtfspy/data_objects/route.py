@@ -1,5 +1,3 @@
-import csv
-
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
@@ -189,7 +187,7 @@ class RouteCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_route(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             route = Route(transit_data=self._transit_data, **kwargs)
 
@@ -206,15 +204,15 @@ class RouteCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_route_object(self, route, recursive=False):
+    def add_object(self, route, recursive=False):
         assert isinstance(route, Route)
 
         if route.id not in self:
             if recursive:
-                self._transit_data.add_agency_object(route.agency, recursive=True)
+                self._transit_data.add_object(route.agency, recursive=True)
             else:
                 assert route.agency in self._transit_data.agencies
-            return self.add_route(**route.to_csv_line())
+            return self.add(**route.to_csv_line())
         else:
             old_route = self[route.id]
             assert route == old_route
@@ -252,12 +250,3 @@ class RouteCollection(BaseGtfsObjectCollection):
         for route in to_clean:
             del route.line.routes[route.id]
             del self._objects[route.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_route(ignore_errors=ignore_errors, condition=filter, **row)

@@ -1,4 +1,3 @@
-import csv
 from datetime import date, time, timedelta
 from operator import attrgetter
 
@@ -264,7 +263,7 @@ class TripCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_trip(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             trip = Trip(transit_data=self._transit_data, **kwargs)
 
@@ -281,20 +280,20 @@ class TripCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_trip_object(self, trip, recursive=False):
+    def add_object(self, trip, recursive=False):
         assert isinstance(trip, Trip)
 
         if trip.id not in self._transit_data.trips:
             if recursive:
-                self._transit_data.add_route_object(trip.route, recursive=True)
-                self._transit_data.add_service_object(trip.service, recursive=True)
+                self._transit_data.add_object(trip.route, recursive=True)
+                self._transit_data.add_object(trip.service, recursive=True)
                 if trip.shape is not None:
-                    self._transit_data.add_shape_object(trip.shape, recursive=True)
+                    self._transit_data.add_object(trip.shape, recursive=True)
             else:
                 assert trip.route in self._transit_data.routes
                 assert trip.service in self._transit_data.calendar
                 assert trip.shape is None or trip.shape in self._transit_data.shapes
-            return self.add_trip(**trip.to_csv_line())
+            return self.add(**trip.to_csv_line())
         else:
             old_trip = self[trip.id]
             assert trip == old_trip
@@ -327,12 +326,3 @@ class TripCollection(BaseGtfsObjectCollection):
         for trip in to_clean:
             trip.route.trips.remove(trip)
             del self._objects[trip.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_trip(ignore_errors=ignore_errors, condition=filter, **row)

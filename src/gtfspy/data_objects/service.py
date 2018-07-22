@@ -1,4 +1,3 @@
-import csv
 from datetime import datetime, date
 
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
@@ -203,7 +202,7 @@ class ServiceCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_service(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             service = Service(**kwargs)
 
@@ -219,11 +218,11 @@ class ServiceCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_service_object(self, service, recursive=False):
+    def add_object(self, service, recursive=False):
         assert isinstance(service, Service)
 
         if service.id not in self:
-            return self.add_service(**service.to_csv_line())
+            return self.add(**service.to_csv_line())
         else:
             old_service = self[service.id]
             assert service == old_service
@@ -255,12 +254,3 @@ class ServiceCollection(BaseGtfsObjectCollection):
 
         for service in to_clean:
             del self._objects[service.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_service(ignore_errors=ignore_errors, condition=filter, **row)

@@ -1,5 +1,3 @@
-import csv
-
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.validating import not_none_or_empty
@@ -78,7 +76,7 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_fare_attribute(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             fare_attribute = FareAttribute(**kwargs)
 
@@ -94,11 +92,11 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_fare_attribute_object(self, fare_attribute, recursive=False):
+    def add_object(self, fare_attribute, recursive=False):
         assert isinstance(fare_attribute, FareAttribute)
 
         if fare_attribute.id not in self:
-            return self.add_fare_attribute(**fare_attribute.to_csv_line())
+            return self.add(**fare_attribute.to_csv_line())
         else:
             old_fare_attribute = self[fare_attribute.id]
             assert fare_attribute == old_fare_attribute
@@ -130,15 +128,6 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
 
         for fare_attribute in to_clean:
             del self._objects[fare_attribute.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_fare_attribute(ignore_errors=ignore_errors, condition=filter, **row)
 
     def has_data(self):
         return len(self._objects) > 0

@@ -134,7 +134,7 @@ class FareRuleCollection:
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_fare_rule(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             fare_rule = FareRule(transit_data=self._transit_data, **kwargs)
 
@@ -149,14 +149,14 @@ class FareRuleCollection:
             if not ignore_errors:
                 raise
 
-    def add_fare_rule_object(self, fare_rule, recursive=False):
+    def add_object(self, fare_rule, recursive=False):
         assert isinstance(fare_rule, FareRule)
 
         if recursive:
             self._transit_data.add_fare_attribute_object(fare_rule.fare, recursive=True)
         else:
             assert fare_rule.fare in self._transit_data.fare_attributes
-        return self.add_fare_rule(**fare_rule.to_csv_line())
+        return self.add(**fare_rule.to_csv_line())
 
     def remove(self, fare_rule, recursive=False, clean_after=True):
         self._objects.remove(fare_rule)
@@ -182,7 +182,7 @@ class FareRuleCollection:
         else:
             reader = csv.DictReader(csv_file)
             for row in reader:
-                self.add_fare_rule(ignore_errors=ignore_errors, condition=filter, **row)
+                self.add(ignore_errors=ignore_errors, condition=filter, **row)
 
     def has_data(self):
         return len(self._objects) > 0

@@ -1,4 +1,3 @@
-import csv
 
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
@@ -146,7 +145,7 @@ class AgencyCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_agency(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             agency = Agency(transit_data=self._transit_data, **kwargs)
 
@@ -162,11 +161,11 @@ class AgencyCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_agency_object(self, agency, recursive=False):
+    def add_object(self, agency, recursive=False):
         assert isinstance(agency, Agency)
 
         if agency.id not in self:
-            return self.add_agency(**agency.to_csv_line())
+            return self.add(**agency.to_csv_line())
         else:
             old_agency = self[agency.id]
             assert agency == old_agency
@@ -198,12 +197,3 @@ class AgencyCollection(BaseGtfsObjectCollection):
 
         for agency in to_clean:
             del self._objects[agency.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_agency(ignore_errors=ignore_errors, condition=filter, **row)

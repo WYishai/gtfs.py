@@ -1,5 +1,3 @@
-import csv
-
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
 from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
@@ -229,7 +227,7 @@ class StopCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_stop(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             stop = Stop(transit_data=self._transit_data, **kwargs)
 
@@ -245,16 +243,16 @@ class StopCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_stop_object(self, stop, recursive=False):
+    def add_object(self, stop, recursive=False):
         assert isinstance(stop, Stop)
 
         if stop.id not in self:
             if stop.parent_station is not None:
                 if recursive:
-                    self.add_stop_object(stop.parent_station, recursive=True)
+                    self.add_object(stop.parent_station, recursive=True)
                 else:
                     assert stop.parent_station in self
-            return self.add_stop(**stop.to_csv_line())
+            return self.add(**stop.to_csv_line())
         else:
             old_stop = self[stop.id]
             assert stop == old_stop
@@ -291,12 +289,3 @@ class StopCollection(BaseGtfsObjectCollection):
 
         for stop_id in to_clean:
             del self._objects[stop_id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_stop(ignore_errors=ignore_errors, condition=filter, **row)

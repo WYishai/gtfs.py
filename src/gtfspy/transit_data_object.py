@@ -183,40 +183,40 @@ class TransitData(object):
                 os.remove(temp_gtfs_file_path)
 
     def add_agency(self, **kwargs):
-        return self.agencies.add_agency(**kwargs)
+        return self.agencies.add(**kwargs)
 
     def add_agency_object(self, agency, recursive=False):
-        return self.agencies.add_agency_object(agency, recursive=recursive)
+        return self.agencies.add_object(agency, recursive=recursive)
 
     def add_route(self, **kwargs):
-        return self.routes.add_route(**kwargs)
+        return self.routes.add(**kwargs)
 
     def add_route_object(self, route, recursive=False):
-        return self.routes.add_route_object(route, recursive=recursive)
+        return self.routes.add_object(route, recursive=recursive)
 
     def add_shape_point(self, **kwargs):
-        return self.shapes.add_shape_point(**kwargs)
+        return self.shapes.add(**kwargs)
 
     def add_shape_object(self, shape, recursive=False):
-        return self.shapes.add_shape_object(shape, recursive=recursive)
+        return self.shapes.add_object(shape, recursive=recursive)
 
     def add_service(self, **kwargs):
-        return self.calendar.add_service(**kwargs)
+        return self.calendar.add(**kwargs)
 
     def add_service_object(self, service, recursive=False):
-        return self.calendar.add_service_object(service, recursive=recursive)
+        return self.calendar.add_object(service, recursive=recursive)
 
     def add_trip(self, **kwargs):
-        return self.trips.add_trip(**kwargs)
+        return self.trips.add(**kwargs)
 
     def add_trip_object(self, trip, recursive=False):
-        return self.trips.add_trip_object(trip, recursive=recursive)
+        return self.trips.add_object(trip, recursive=recursive)
 
     def add_stop(self, **kwargs):
-        return self.stops.add_stop(**kwargs)
+        return self.stops.add(**kwargs)
 
     def add_stop_object(self, stop, recursive=False):
-        return self.stops.add_stop_object(stop, recursive=recursive)
+        return self.stops.add_object(stop, recursive=recursive)
 
     def add_stop_time(self, **kwargs):
         stop_time = StopTime(transit_data=self, **kwargs)
@@ -239,16 +239,16 @@ class TransitData(object):
         return self.add_stop_time(**stop_time.to_csv_line())
 
     def add_fare_attribute(self, **kwargs):
-        return self.fare_attributes.add_fare_attribute(**kwargs)
+        return self.fare_attributes.add(**kwargs)
 
     def add_fare_attribute_object(self, fare_attribute, recursive=False):
-        return self.fare_attributes.add_fare_attribute_object(fare_attribute, recursive=recursive)
+        return self.fare_attributes.add_object(fare_attribute, recursive=recursive)
 
     def add_fare_rule(self, **kwargs):
-        return self.fare_rules.add_fare_rule(**kwargs)
+        return self.fare_rules.add(**kwargs)
 
     def add_fare_rule_object(self, fare_rule, recursive=False):
-        return self.fare_rules.add_fare_rule_object(fare_rule, recursive=recursive)
+        return self.fare_rules.add_object(fare_rule, recursive=recursive)
 
     def clean(self):
         self.trips.clean()

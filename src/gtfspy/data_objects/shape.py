@@ -111,7 +111,7 @@ class ShapeCollection(BaseGtfsObjectCollection):
         if csv_file is not None:
             self._load_file(csv_file)
 
-    def add_shape_point(self, ignore_errors=False, condition=None, **kwargs):
+    def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
             shape_id = int(kwargs.pop("shape_id"))
             shape_point = ShapePoint(**kwargs)
@@ -132,12 +132,12 @@ class ShapeCollection(BaseGtfsObjectCollection):
             if not ignore_errors:
                 raise
 
-    def add_shape_object(self, shape, recursive=False):
+    def add_object(self, shape, recursive=False):
         assert isinstance(shape, Shape)
 
         if shape.id not in self:
             for row in shape.to_csv_line():
-                self.add_shape_point(**row)
+                self.add(**row)
             return self[shape.id]
         else:
             old_shape = self[shape.id]
@@ -170,15 +170,6 @@ class ShapeCollection(BaseGtfsObjectCollection):
 
         for shape in to_clean:
             del self._objects[shape.id]
-
-    def _load_file(self, csv_file, ignore_errors=False, filter=None):
-        if isinstance(csv_file, str):
-            with open(csv_file, "rb") as f:
-                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
-        else:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                self.add_shape_point(ignore_errors=ignore_errors, condition=filter, **row)
 
     def save(self, csv_file):
         if isinstance(csv_file, str):

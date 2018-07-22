@@ -1,5 +1,6 @@
 import csv
 import sys
+from abc import abstractmethod
 
 import gtfspy
 
@@ -14,6 +15,10 @@ class BaseGtfsObjectCollection(object):
         self._objects_type = objects_type
         self._objects = {}
 
+    @abstractmethod
+    def add(self, ignore_errors=False, condition=None, **kwargs):
+        pass
+
     def save(self, csv_file):
         if isinstance(csv_file, str):
             with open(csv_file, "wb") as f:
@@ -26,6 +31,15 @@ class BaseGtfsObjectCollection(object):
             writer = csv.DictWriter(csv_file, fieldnames=fields, restval=None)
             writer.writeheader()
             writer.writerows(obj.to_csv_line() for obj in self)
+
+    def _load_file(self, csv_file, ignore_errors=False, filter=None):
+        if isinstance(csv_file, str):
+            with open(csv_file, "rb") as f:
+                self._load_file(f, ignore_errors=ignore_errors, filter=filter)
+        else:
+            reader = csv.DictReader(csv_file)
+            for row in reader:
+                self.add(ignore_errors=ignore_errors, condition=filter, **row)
 
     def validate(self):
         for i, obj in self._objects.iteritems():
