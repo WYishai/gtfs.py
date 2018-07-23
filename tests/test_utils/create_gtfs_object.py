@@ -24,6 +24,10 @@ def create_full_transit_data():
                        shape_pt_sequence=0, shape_dist_traveled=0)
     td.add_shape_point(shape_id=1, shape_pt_lat=td.stops[20000].stop_lat, shape_pt_lon=td.stops[20000].stop_lon,
                        shape_pt_sequence=1, shape_dist_traveled=None, test_attribute="shape test data")
+    td.add_shape_point(shape_id=2, shape_pt_lat=td.stops[20000].stop_lat, shape_pt_lon=td.stops[20000].stop_lon,
+                       shape_pt_sequence=0)
+    td.add_shape_point(shape_id=2, shape_pt_lat=td.stops[10001].stop_lat, shape_pt_lon=td.stops[10001].stop_lon,
+                       shape_pt_sequence=1)
 
     td.add_service(service_id=1, start_date=date.today(), end_date=date.today() + timedelta(weeks=8), sunday=True,
                    monday=True, tuesday=True, wednesday=True, thursday=True)
