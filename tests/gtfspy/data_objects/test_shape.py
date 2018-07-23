@@ -23,9 +23,9 @@ class TestShape(unittest.TestCase):
         self.assertTrue(hasattr(shape, "id"))
         self.assertRaises(Exception, setattr, shape, "id", "2")
 
-        test_property(self, shape_point, property_name="shape_pt_lat", new_value=0)
-        test_property(self, shape_point, property_name="shape_pt_lon", new_value=0)
-        test_property(self, shape_point, property_name="shape_pt_sequence", new_value=2)
+        test_property(self, shape_point, property_name="latitude", new_value=0)
+        test_property(self, shape_point, property_name="longitude", new_value=0)
+        test_property(self, shape_point, property_name="sequence", new_value=2)
         test_property(self, shape_point, property_name="shape_dist_traveled", new_value=60.2)
 
     def test_maximum_properties(self):
@@ -38,9 +38,9 @@ class TestShape(unittest.TestCase):
         self.assertTrue(hasattr(shape, "id"))
         self.assertRaises(Exception, setattr, shape, "id", "2")
 
-        test_property(self, shape_point, property_name="shape_pt_lat", new_value=0)
-        test_property(self, shape_point, property_name="shape_pt_lon", new_value=0)
-        test_property(self, shape_point, property_name="shape_pt_sequence", new_value=2)
+        test_property(self, shape_point, property_name="latitude", new_value=0)
+        test_property(self, shape_point, property_name="longitude", new_value=0)
+        test_property(self, shape_point, property_name="sequence", new_value=2)
         test_property(self, shape_point, property_name="shape_dist_traveled", new_value=60.2)
 
         self.assertIn("test_attribute", shape_point.attributes)
@@ -94,14 +94,21 @@ class TestShape(unittest.TestCase):
         new_td = TransitData()
         for row, original_shape_point in zip(FULL_SHAPE_CSV_ROWS, iter(original_td.shapes).next().shape_points):
             edited_shape_point = new_td.shapes.add(**row)
-            edited_shape_point.shape_pt_lat = 0
+            edited_shape_point.latitude = 0
             self.assertNotEqual(original_shape_point, edited_shape_point)
         self.assertNotEqual(iter(original_td.shapes).next(), iter(new_td.shapes).next())
 
         new_td = TransitData()
         for row, original_shape_point in zip(FULL_SHAPE_CSV_ROWS, iter(original_td.shapes).next().shape_points):
             edited_shape_point = new_td.shapes.add(**row)
-            edited_shape_point.shape_pt_sequence += 1
+            edited_shape_point.longitude = 0
+            self.assertNotEqual(original_shape_point, edited_shape_point)
+        self.assertNotEqual(iter(original_td.shapes).next(), iter(new_td.shapes).next())
+
+        new_td = TransitData()
+        for row, original_shape_point in zip(FULL_SHAPE_CSV_ROWS, iter(original_td.shapes).next().shape_points):
+            edited_shape_point = new_td.shapes.add(**row)
+            edited_shape_point.sequence += 1
             self.assertNotEqual(original_shape_point, edited_shape_point)
         self.assertNotEqual(iter(original_td.shapes).next(), iter(new_td.shapes).next())
 
@@ -127,9 +134,9 @@ class TestShapeCollection(unittest.TestCase):
             for row in rows:
                 shape_point = td.shapes.add(**row)
 
-                self.assertEqual(shape_point.shape_pt_lat, row.get("shape_pt_lat"))
-                self.assertEqual(shape_point.shape_pt_lon, row.get("shape_pt_lon"))
-                self.assertEqual(shape_point.shape_pt_sequence, row.get("shape_pt_sequence"))
+                self.assertEqual(shape_point.latitude, row.get("shape_pt_lat"))
+                self.assertEqual(shape_point.longitude, row.get("shape_pt_lon"))
+                self.assertEqual(shape_point.sequence, row.get("shape_pt_sequence"))
                 self.assertEqual(shape_point.shape_dist_traveled, row.get("shape_dist_traveled"))
                 self.assertEqual(shape_point.attributes.get("test_attribute"), row.get("test_attribute"))
 
@@ -160,7 +167,7 @@ class TestShapeCollection(unittest.TestCase):
             dest_td.shapes.add_object(source_shape)
             self.assertEqual(shapes_num, len(dest_td.shapes))
 
-            source_shape.shape_points[-1].shape_pt_sequence += 1
+            source_shape.shape_points[-1].sequence += 1
             self.assertRaises(Exception, dest_td.shapes.add_object, source_shape)
 
     def test_remove(self):

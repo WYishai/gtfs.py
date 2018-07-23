@@ -16,9 +16,9 @@ class ShapePoint(object):
         :type shape_dist_traveled: str | float | None
         """
 
-        self.shape_pt_lat = float(shape_pt_lat)
-        self.shape_pt_lon = float(shape_pt_lon)
-        self.shape_pt_sequence = int(shape_pt_sequence)
+        self.latitude = float(shape_pt_lat)
+        self.longitude = float(shape_pt_lon)
+        self.sequence = int(shape_pt_sequence)
 
         self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
         if not_none_or_empty(shape_dist_traveled):
@@ -41,15 +41,15 @@ class ShapePoint(object):
         self.attributes["shape_dist_traveled"] = value
 
     def validate(self, transit_data):
-        assert 90 >= self.shape_pt_lat >= -90
-        assert 180 >= self.shape_pt_lon >= -180
+        assert 90 >= self.latitude >= -90
+        assert 180 >= self.longitude >= -180
 
     def __eq__(self, other):
         if not isinstance(other, ShapePoint):
             return False
 
-        return self.shape_pt_lat == other.shape_pt_lat and self.shape_pt_lon == other.shape_pt_lon and \
-               self.shape_pt_sequence == other.shape_pt_sequence and \
+        return self.latitude == other.latitude and self.longitude == other.longitude and \
+               self.sequence == other.sequence and \
                (self.shape_dist_traveled is None or other.shape_dist_traveled is None or
                 self.shape_dist_traveled == other.shape_dist_traveled) and \
                self.attributes == other.attributes
@@ -66,7 +66,7 @@ class Shape(object):
 
         self._id = int(shape_id)
 
-        self.shape_points = SortedList(key=attrgetter("shape_pt_sequence"))
+        self.shape_points = SortedList(key=attrgetter("sequence"))
 
     @property
     def id(self):
@@ -79,9 +79,9 @@ class Shape(object):
     def to_csv_line(self):
         for shape_point in self.shape_points:
             result = dict(shape_id=self.id,
-                          shape_pt_lat=shape_point.shape_pt_lat,
-                          shape_pt_lon=shape_point.shape_pt_lon,
-                          shape_pt_sequence=shape_point.shape_pt_sequence,
+                          shape_pt_lat=shape_point.latitude,
+                          shape_pt_lon=shape_point.longitude,
+                          shape_pt_sequence=shape_point.sequence,
                           **shape_point.attributes)
             yield result
 
