@@ -41,8 +41,8 @@ class ShapePoint(object):
         self.attributes["shape_dist_traveled"] = value
 
     def validate(self, transit_data):
-        # TODO: validate ShapePoint values
-        pass
+        assert 90 >= self.shape_pt_lat >= -90
+        assert 180 >= self.shape_pt_lon >= -180
 
     def __eq__(self, other):
         if not isinstance(other, ShapePoint):

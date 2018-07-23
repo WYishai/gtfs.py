@@ -204,6 +204,8 @@ class Stop(object):
         :type transit_data: gtfspy.transit_data_object.TransitData
         """
 
+        assert 90 >= self.stop_lat >= -90
+        assert 180 >= self.stop_lon >= -180
         assert validate_true_false(self.attributes.get("location_type", 0))
         assert self.parent_station is None or self.parent_station in transit_data.stops
         assert validate_yes_no_unknown(self.attributes.get("wheelchair_boarding", None))
