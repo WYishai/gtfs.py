@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/gtfspy.iml" filepath="$PROJECT_DIR$/.idea/gtfspy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/gtfs.py.iml" filepath="$PROJECT_DIR$/.idea/gtfs.py.iml" />
     </modules>
   </component>
 </project>
