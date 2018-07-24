@@ -12,9 +12,9 @@ class FareRule(object):
         :type transit_data: gtfspy.transit_data_object.TransitData
         :type fare_id: str
         :type route_id: str | None
-        :type origin_id: str | None
-        :type destination_id: str | None
-        :type contains_id: str | None
+        :type origin_id: str | int | None
+        :type destination_id: str | int | None
+        :type contains_id: str | int | None
         """
 
         self.fare = transit_data.fare_attributes[fare_id]
@@ -111,6 +111,7 @@ class FareRule(object):
 
         assert transit_data.fare_attributes[self.fare.id] is self.fare
         assert self.route is None or transit_data.routes[self.route.id] is self.route
+        assert self.route is None or self.fare.agency is None or self.route.agency is self.fare.agency
 
     def __eq__(self, other):
         if not isinstance(other, FareRule):

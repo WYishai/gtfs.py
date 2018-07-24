@@ -30,7 +30,7 @@ class TestStop(unittest.TestCase):
         test_property(self, stop, property_name="stop_desc", new_value="test desc")
         test_property(self, stop, property_name="zone_id", new_value=2)
         test_property(self, stop, property_name="stop_url", new_value="http://testurl.com/")
-        test_property(self, stop, property_name="is_central_station", new_value=True)
+        test_property(self, stop, property_name="location_type", new_value=1)
         test_property(self, stop, property_name="parent_station", new_value=stop)
         test_property(self, stop, property_name="stop_timezone", new_value="Asia/Hebron")
         test_property(self, stop, property_name="wheelchair_boarding", new_value=True)
@@ -51,7 +51,7 @@ class TestStop(unittest.TestCase):
         test_property(self, stop, property_name="stop_desc", new_value="test desc")
         test_property(self, stop, property_name="zone_id", new_value=2)
         test_property(self, stop, property_name="stop_url", new_value="http://testurl.com/")
-        test_property(self, stop, property_name="is_central_station", new_value=True)
+        test_property(self, stop, property_name="location_type", new_value=1)
         test_property(self, stop, property_name="parent_station", new_value=stop)
         test_property(self, stop, property_name="stop_timezone", new_value="Asia/Hebron")
         test_property(self, stop, property_name="wheelchair_boarding", new_value=False)
@@ -154,7 +154,7 @@ class TestStop(unittest.TestCase):
         edited_stop = None
         for row in FULL_STOP_CSV_ROWS:
             edited_stop = new_td.stops.add(**row)
-        edited_stop.is_central_station = True
+        edited_stop.location_type = 1
         self.assertNotEqual(original_stop, edited_stop)
 
         new_td = TransitData()
@@ -207,7 +207,7 @@ class TestStopCollection(unittest.TestCase):
                 self.assertEqual(stop.stop_name, row.get("stop_name"))
                 self.assertEqual(stop.stop_lat, row.get("stop_lat"))
                 self.assertEqual(stop.stop_lon, row.get("stop_lon"))
-                self.assertEqual(stop.is_central_station, bool(row.get("location_type", False)))
+                self.assertEqual(stop.location_type, row.get("location_type"))
                 self.assertEqual(stop.stop_code, row.get("stop_code"))
                 self.assertEqual(stop.stop_desc, row.get("stop_desc"))
                 self.assertEqual(stop.zone_id, row.get("zone_id"))

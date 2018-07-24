@@ -1,12 +1,12 @@
 import gtfspy
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
-from gtfspy.utils.parsing import parse_yes_no_unknown, yes_no_unknown_to_int
 from gtfspy.utils.validating import not_none_or_empty, validate_yes_no_unknown
 
 
 class Route(object):
     def __init__(self, transit_data, route_id, route_short_name, route_long_name, route_type, agency_id,
-                 route_desc=None, route_color=None, route_text_color=None, bikes_allowed=None, **kwargs):
+                 route_desc=None, route_url=None, route_color=None, route_text_color=None, route_sort_order=None,
+                 **kwargs):
         """
         :type transit_data: gtfspy.transit_data_object.TransitData
         :type route_id: str
@@ -15,9 +15,10 @@ class Route(object):
         :type route_type: str | int
         :type agency_id: str | int
         :type route_desc: str | None
+        :type route_url: str | None
         :type route_color: str | None
         :type route_text_color: str | None
-        :type bikes_allowed: str | int | bool | None
+        :type route_sort_order: str | int | None
         """
 
         self._id = route_id
@@ -30,16 +31,15 @@ class Route(object):
         self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
         if not_none_or_empty(route_desc):
             self.attributes["route_desc"] = str(route_desc)
+        if not_none_or_empty(route_url):
+            self.attributes["route_url"] = str(route_url)
         if not_none_or_empty(route_color):
             # TODO: find type for the route color
             self.attributes["route_color"] = str(route_color)
         if not_none_or_empty(route_text_color):
             self.attributes["route_text_color"] = str(route_text_color)
-        if not_none_or_empty(bikes_allowed):
-            if isinstance(bikes_allowed, bool):
-                self.attributes["bikes_allowed"] = yes_no_unknown_to_int(bikes_allowed)
-            else:
-                self.attributes["bikes_allowed"] = int(bikes_allowed)
+        if not_none_or_empty(route_sort_order):
+            self.attributes["route_sort_order"] = int(route_sort_order)
 
         self.line = self.agency.get_line(self)
         self.trips = []
@@ -63,6 +63,22 @@ class Route(object):
         """
 
         self.attributes["route_desc"] = value
+
+    @property
+    def route_url(self):
+        """
+        :rtype: str | None
+        """
+
+        return self.attributes.get("route_url", None)
+
+    @route_url.setter
+    def route_url(self, value):
+        """
+        :type value: str | None
+        """
+
+        self.attributes["route_url"] = value
 
     @property
     def route_color(self):
@@ -97,20 +113,20 @@ class Route(object):
         self.attributes["route_text_color"] = value
 
     @property
-    def bikes_allowed(self):
+    def route_sort_order(self):
         """
-        :rtype: bool | None
-        """
-
-        return parse_yes_no_unknown(self.attributes.get("bikes_allowed", None))
-
-    @bikes_allowed.setter
-    def bikes_allowed(self, value):
-        """
-        :type value: bool | None
+        :rtype: str | None
         """
 
-        self.attributes["bikes_allowed"] = yes_no_unknown_to_int(value)
+        return self.attributes.get("route_sort_order", None)
+
+    @route_sort_order.setter
+    def route_sort_order(self, value):
+        """
+        :type value: str | int | None
+        """
+
+        self.attributes["route_sort_order"] = int(value)
 
     @property
     def stops(self):

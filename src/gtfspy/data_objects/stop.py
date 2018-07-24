@@ -121,15 +121,15 @@ class Stop(object):
         self.attributes["stop_url"] = value
 
     @property
-    def is_central_station(self):
+    def location_type(self):
         """
         :rtype: bool
         """
 
-        return bool(self.attributes.get("location_type", False))
+        return self.attributes.get("location_type")
 
-    @is_central_station.setter
-    def is_central_station(self, value):
+    @location_type.setter
+    def location_type(self, value):
         """
         :type value: bool
         """
@@ -207,7 +207,9 @@ class Stop(object):
         assert 90 >= self.stop_lat >= -90
         assert 180 >= self.stop_lon >= -180
         assert validate_true_false(self.attributes.get("location_type", 0))
-        assert self.parent_station is None or self.parent_station in transit_data.stops
+        assert self.parent_station is None or \
+               (self.parent_station in transit_data.stops and self.parent_station.location_type == 1)
+        assert self.location_type != 1 or self.parent_station is None
         assert validate_yes_no_unknown(self.attributes.get("wheelchair_boarding", None))
 
     def __eq__(self, other):

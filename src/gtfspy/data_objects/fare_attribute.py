@@ -1,23 +1,61 @@
 import gtfspy
+from gtfspy.data_objects import Agency
 from gtfspy.data_objects.base_object import BaseGtfsObjectCollection
+from gtfspy.utils.parsing import parse_or_default
 from gtfspy.utils.validating import not_none_or_empty
 
 
 class FareAttribute(object):
-    def __init__(self, fare_id, price, currency_type, payment_method, transfers, transfer_duration=None, **kwargs):
+    def __init__(self, transit_data, fare_id, price, currency_type, payment_method, transfers, agency_id=None,
+                 transfer_duration=None,
+                 **kwargs):
         self._id = fare_id
         self.price = float(price)
         self.currency_type = currency_type
         self.payment_method = int(payment_method)
-        self.transfers = int(transfers)
+        self.transfers = parse_or_default(transfers, None, int)
 
         self.attributes = {k: v for k, v in kwargs.iteritems() if not_none_or_empty(v)}
+        if not_none_or_empty(agency_id):
+            self.attributes["agency_id"] = transit_data.agencies[int(agency_id)]
         if not_none_or_empty(transfer_duration):
             self.attributes["transfer_duration"] = int(transfer_duration)
 
     @property
     def id(self):
         return self._id
+
+    @property
+    def is_prepaid_needed(self):
+        """
+        :rtype: bool | None
+        """
+
+        return bool(self.payment_method)
+
+    @is_prepaid_needed.setter
+    def is_prepaid_needed(self, value):
+        """
+        :type value: bool | None
+        """
+
+        self.payment_method = int(value)
+
+    @property
+    def agency(self):
+        """
+        :rtype: Agency | None
+        """
+
+        return self.attributes.get("agency_id", None)
+
+    @agency.setter
+    def agency(self, value):
+        """
+        :type value: Agency | None
+        """
+
+        self.attributes["agency_id"] = value
 
     @property
     def transfer_duration(self):
@@ -39,12 +77,17 @@ class FareAttribute(object):
         return ["fare_id", "price", "currency_type", "payment_method", "transfers"] + self.attributes.keys()
 
     def to_csv_line(self):
-        return dict(fare_id=self.id,
-                    price="%.2f" % (self.price,),
-                    currency_type=self.currency_type,
-                    payment_method=self.payment_method,
-                    transfers=self.transfers,
-                    **self.attributes)
+        result = dict(fare_id=self.id,
+                      price="%.2f" % (self.price,),
+                      currency_type=self.currency_type,
+                      payment_method=self.payment_method,
+                      transfers=self.transfers,
+                      **self.attributes)
+
+        if "agency_id" in result:
+            result["agency_id"] = self.agency.id
+
+        return result
 
     def validate(self, transit_data):
         """
@@ -78,7 +121,7 @@ class FareAttributeCollection(BaseGtfsObjectCollection):
 
     def add(self, ignore_errors=False, condition=None, **kwargs):
         try:
-            fare_attribute = FareAttribute(**kwargs)
+            fare_attribute = FareAttribute(transit_data=self._transit_data, **kwargs)
 
             if condition is not None and not condition(fare_attribute):
                 return None

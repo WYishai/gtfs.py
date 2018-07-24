@@ -41,12 +41,44 @@ class StopTime(object):
             self.attributes["timepoint"] = int(timepoint)
 
     @property
+    def pickup_type(self):
+        """
+        :rtype: int
+        """
+
+        return self.attributes.get("pickup_type", 0)
+
+    @pickup_type.setter
+    def pickup_type(self, value):
+        """
+        :type value: int
+        """
+
+        self.attributes["pickup_type"] = int(value)
+
+    @property
+    def drop_off_type(self):
+        """
+        :rtype: int
+        """
+
+        return self.attributes.get("drop_off_type", 0)
+
+    @drop_off_type.setter
+    def drop_off_type(self, value):
+        """
+        :type value: int
+        """
+
+        self.attributes["drop_off_type"] = int(value)
+
+    @property
     def allow_pickup(self):
         """
         :rtype: bool
         """
 
-        return not bool(self.attributes.get("pickup_type", 0))
+        return self.pickup_type != 1
 
     @allow_pickup.setter
     def allow_pickup(self, value):
@@ -54,7 +86,7 @@ class StopTime(object):
         :type value: bool
         """
 
-        self.attributes["pickup_type"] = int(not value)
+        self.pickup_type = int(not value)
 
     @property
     def allow_drop_off(self):
@@ -62,7 +94,7 @@ class StopTime(object):
         :rtype: bool
         """
 
-        return not bool(self.attributes.get("drop_off_type", 0))
+        return self.drop_off_type != 1
 
     @allow_drop_off.setter
     def allow_drop_off(self, value):
@@ -70,7 +102,7 @@ class StopTime(object):
         :type value: bool
         """
 
-        self.attributes["drop_off_type"] = int(not value)
+        self.drop_off_type = int(not value)
 
     @property
     def shape_dist_traveled(self):
@@ -105,20 +137,20 @@ class StopTime(object):
         self.attributes["stop_headsign"] = value
 
     @property
-    def timepoint(self):
+    def is_exact_time(self):
         """
         :rtype: int | None
         """
 
-        return self.attributes.get("timepoint", None)
+        return bool(self.attributes.get("timepoint", 1))
 
-    @timepoint.setter
-    def timepoint(self, value):
+    @is_exact_time.setter
+    def is_exact_time(self, value):
         """
-        :type value: int | None
+        :type value: bool | None
         """
 
-        self.attributes["timepoint"] = value
+        self.attributes["timepoint"] = int(value)
 
     def get_csv_fields(self):
         return ["trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence"] + self.attributes.keys()

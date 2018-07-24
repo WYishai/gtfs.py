@@ -100,16 +100,16 @@ def create_full_transit_data():
                      departure_time=timedelta(hours=25, minutes=13), stop_id=30000, stop_sequence=2, pickup_type=1)
     td.add_stop_time(trip_id="30001_1", arrival_time=timedelta(hours=11, minutes=30),
                      departure_time=timedelta(hours=11, minutes=30), stop_id=20000, stop_sequence=0, drop_off_type=1,
-                     stop_headsign="Tel Aviv Central Station headsign", timepoint=0,
+                     stop_headsign="Tel Aviv Central Station headsign", timepoint=1,
                      test_attribute="stop time test data 1")
     td.add_stop_time(trip_id="30001_1", arrival_time=timedelta(hours=12, minutes=20),
                      departure_time=timedelta(hours=12, minutes=20), stop_id=30000, stop_sequence=1, pickup_type=1,
-                     stop_headsign="Netania Central Station headsign", timepoint=1,
+                     stop_headsign="Netania Central Station headsign", timepoint=0,
                      test_attribute="stop time test data 2")
 
     td.add_fare_attribute(fare_id="1", price=10, currency_type="ILS", payment_method=0, transfers=0)
     td.add_fare_attribute(fare_id="2", price=12.2, currency_type="ILS", payment_method=0, transfers=0)
-    td.add_fare_attribute(fare_id="3", price=16.85, currency_type="ILS", payment_method=0, transfers=0,
+    td.add_fare_attribute(fare_id="3", price=16.85, currency_type="ILS", payment_method=1, transfers=0, agency_id=30,
                           transfer_duration=1, test_attribute="fare attribute test data")
 
     td.add_fare_rule(fare_id="3", route_id="30001")

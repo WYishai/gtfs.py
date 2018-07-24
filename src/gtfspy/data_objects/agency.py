@@ -180,6 +180,11 @@ class AgencyCollection(BaseGtfsObjectCollection):
         if recursive:
             for line in list(agency.lines):
                 agency.lines.remove(line, recursive=True, clean_after=False)
+
+            fare_rules_to_remove = [fare_attribute for fare_attribute in self._transit_data.fare_attributes
+                                    if fare_attribute.agency is agency]
+            for fare_attribute in fare_rules_to_remove:
+                self._transit_data.fare_attributes.remove(fare_attribute, recursive=True, clean_after=False)
         else:
             for line in agency.lines:
                 assert len(line.routes) == 0
