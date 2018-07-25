@@ -43,7 +43,7 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
     """
     :rtype: TransitData
     :type transit_data: TransitData
-    :type lines: dict[int, list[str]]
+    :type lines: dict[int, list[str]] | dict[int, None]
     :type add_unknown_files: bool
     """
 
@@ -87,6 +87,12 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
 
 
 def load_partial_transit_data(gtfs_file, lines):
+    """
+    :rtype: TransitData
+    :type transit_data: TransitData
+    :type lines: dict[int, list[str]] | dict[int, None]
+    """
+
     td = TransitData()
     td.load_gtfs_file(gtfs_file, partial=lines)
     return td
