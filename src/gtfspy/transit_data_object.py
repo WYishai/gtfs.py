@@ -169,7 +169,7 @@ class TransitData(object):
                     self.fare_rules.save(f)
 
             for file_name, file_data in self.unknown_files.iteritems():
-                with open(os.path.join(tempdir, file_name)) as f:
+                with open(os.path.join(tempdir, file_name), "wb") as f:
                     f.write(file_data.data)
 
             with ZipFile(temp_gtfs_file_path, mode="w", compression=compression) as zip_file:
