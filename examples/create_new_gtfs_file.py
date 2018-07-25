@@ -918,7 +918,7 @@ def add_agencies(td):
 
     td.add_agency(agency_id=1, agency_name="agency name 1", agency_url="http://www.agencyname1.com/",
                   agency_timezone="Asia/Jerusalem")
-    td.add_agency(agency_id=30, agency_name="agency name 30", agency_url="https://www.agencyname30.com/",
+    td.add_agency(agency_id=15, agency_name="agency name 15", agency_url="https://www.agencyname30.com/",
                   agency_timezone="Asia/Jerusalem")
 
 
@@ -934,7 +934,7 @@ def add_routes(td):
     td.add_route(route_id="1003", route_short_name="3", route_long_name="route 1003 long name", route_type=3,
                  agency_id=1)
     td.add_route(route_id="30001", route_short_name="301", route_long_name="route 30001 long name", route_type=2,
-                 agency_id=30)
+                 agency_id=15)
 
 
 def add_trips(td):

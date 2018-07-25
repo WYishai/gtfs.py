@@ -23,7 +23,7 @@ class TestFareAttribute(unittest.TestCase):
         test_property(self, fare_attribute, property_name="is_prepaid_needed",
                       new_value=not fare_attribute.is_prepaid_needed)
         test_property(self, fare_attribute, property_name="transfers", new_value=1)
-        test_property(self, fare_attribute, property_name="agency", new_value=td.agencies[30])
+        test_property(self, fare_attribute, property_name="agency", new_value=td.agencies[15])
         test_property(self, fare_attribute, property_name="transfer_duration", new_value=2)
 
     def test_maximum_properties(self):
@@ -39,7 +39,7 @@ class TestFareAttribute(unittest.TestCase):
         test_property(self, fare_attribute, property_name="is_prepaid_needed",
                       new_value=not fare_attribute.is_prepaid_needed)
         test_property(self, fare_attribute, property_name="transfers", new_value=1)
-        test_property(self, fare_attribute, property_name="agency", new_value=td.agencies[30])
+        test_property(self, fare_attribute, property_name="agency", new_value=td.agencies[15])
         test_property(self, fare_attribute, property_name="transfer_duration", new_value=2)
 
         self.assertIn("test_attribute", fare_attribute.attributes)
@@ -107,7 +107,7 @@ class TestFareAttribute(unittest.TestCase):
 
         new_td = create_full_transit_data()
         edited_fare_attribute = new_td.fare_attributes.add(**FULL_FARE_ATTRIBUTE_CSV_ROW)
-        edited_fare_attribute.agency = new_td.agencies[30]
+        edited_fare_attribute.agency = new_td.agencies[15]
         self.assertNotEqual(original_fare_attribute, edited_fare_attribute)
 
         new_td = create_full_transit_data()

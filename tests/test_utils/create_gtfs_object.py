@@ -43,19 +43,19 @@ def create_full_transit_data():
                   agency_timezone="Asia/Jerusalem", agency_lang="HE", agency_phone="+972-2-1234567",
                   agency_email="agencyname1@host.com", agency_fare_url="http://www.agencyname1.com/fare",
                   test_attribute="test data 1")
-    td.add_agency(agency_id=30, agency_name="agency name 30", agency_url="https://www.agencyname30.com/",
-                  agency_timezone="Asia/Jerusalem", agency_phone="*1234", agency_email="mail@agencyname30.com",
-                  agency_fare_url="https://www.agencyname30.com/fare")
+    td.add_agency(agency_id=15, agency_name="agency name 15", agency_url="https://www.agencyname15.com/",
+                  agency_timezone="Asia/Jerusalem", agency_phone="*1234", agency_email="mail@agencyname15.com",
+                  agency_fare_url="https://www.agencyname15.com/fare")
 
     td.add_route(route_id="1001", route_short_name="1", route_long_name="route 1001 long name", route_type=3,
-                 agency_id=1, route_desc=None, route_color=None, route_text_color=None, bikes_allowed=True)
+                 agency_id=1, route_desc=None, route_color=None, route_text_color=None)
     td.add_route(route_id="1002", route_short_name="2", route_long_name="route 1002 long name", route_type=3,
-                 agency_id=1, route_desc=None, route_color=None, route_text_color=None, bikes_allowed=True)
+                 agency_id=1, route_desc=None, route_color=None, route_text_color=None)
     td.add_route(route_id="1003", route_short_name="3", route_long_name="route 1003 long name", route_type=3,
-                 agency_id=1, route_desc=None, route_color=None, route_text_color=None, bikes_allowed=False)
+                 agency_id=1, route_desc=None, route_color=None, route_text_color=None)
     td.add_route(route_id="30001", route_short_name="301", route_long_name="route 30001 long name", route_type=2,
-                 agency_id=30, route_desc="Rail!", route_color=None, route_text_color=None, bikes_allowed=None,
-                 test_attribute="test data 30001")
+                 agency_id=15, route_desc="Rail!", route_url="http://routeurl.com/", route_color=None,
+                 route_text_color=None, route_sort_order=1, test_attribute="test data 30001")
 
     td.add_trip(trip_id="1001_1", route_id="1001", service_id=2, shape_id=1, bikes_allowed=False)
     td.add_trip(trip_id="1001_2", route_id="1001", service_id=1, shape_id=2, bikes_allowed=None)
@@ -109,7 +109,7 @@ def create_full_transit_data():
 
     td.add_fare_attribute(fare_id="1", price=10, currency_type="ILS", payment_method=0, transfers=0)
     td.add_fare_attribute(fare_id="2", price=12.2, currency_type="ILS", payment_method=0, transfers=0)
-    td.add_fare_attribute(fare_id="3", price=16.85, currency_type="ILS", payment_method=1, transfers=0, agency_id=30,
+    td.add_fare_attribute(fare_id="3", price=16.85, currency_type="ILS", payment_method=1, transfers=0, agency_id=15,
                           transfer_duration=1, test_attribute="fare attribute test data")
 
     td.add_fare_rule(fare_id="3", route_id="30001")

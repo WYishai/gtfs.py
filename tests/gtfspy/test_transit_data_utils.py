@@ -12,18 +12,31 @@ class TestTransitDataUtils(unittest.TestCase):
         self.assertEqual(td1, td2)
 
     def test_create_partial(self):
-        lines = {15: ["58", "358", "458"]}
-        td1 = TransitData(gtfs_file=constants.GTFS_TEST_FILE_PATH)
-        td2 = create_partial_transit_data(td1, lines)
-        self.assertEqual(sorted(agency.id for agency in td2.agencies), sorted(lines.iterkeys()))
-        for agency in td2.agencies:
-            self.assertEqual(sorted(lines[agency.id]), sorted(line.line_number for line in agency.lines))
+        partial = {15: ["58", "358", "458"]}
+        for file_path in constants.GTFS_TEST_FILES:
+            print "testing '%s'" % (file_path,)
+
+            td1 = TransitData(gtfs_file=file_path)
+            td2 = create_partial_transit_data(td1, partial)
+            self.assertListEqual(sorted(agency.id for agency in td2.agencies),
+                                 sorted(agency for agency in partial.iterkeys() if agency in td1.agencies))
+            for agency in td2.agencies:
+                if partial[agency.id] is not None:
+                    self.assertListEqual(sorted(line.line_number for line in agency.lines),
+                                         sorted(line.line_number for line in td1.agencies[agency.id].lines
+                                                if line.line_number in partial[agency.id]))
+                else:
+                    self.assertListEqual(sorted(line.line_number for line in agency.lines),
+                                         sorted(line.line_number for line in td1.agencies[agency.id].lines))
 
     def test_load_partial(self):
         lines = {15: ["58", "358", "458"]}
-        td1 = load_partial_transit_data(constants.GTFS_TEST_FILE_PATH, lines)
-        td2 = create_partial_transit_data(TransitData(gtfs_file=constants.GTFS_TEST_FILE_PATH), lines)
-        self.assertEqual(td1, td2)
+        for file_path in constants.GTFS_TEST_FILES:
+            print "testing '%s'" % (file_path,)
+
+            td1 = load_partial_transit_data(file_path, lines)
+            td2 = create_partial_transit_data(TransitData(gtfs_file=file_path), lines)
+            self.assertEqual(td1, td2)
 
 
 if __name__ == '__main__':
