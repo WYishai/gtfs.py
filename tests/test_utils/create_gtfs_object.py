@@ -134,6 +134,7 @@ def create_full_transit_data():
     writer.writeheader()
     writer.writerow({"key1": "value1_1", "key2": "value2_1"})
     writer.writerow({"key1": "value1_2", "key2": "value2_2"})
+    dome_file.seek(0)
     td.unknown_files["unknown.txt"] = UnknownFile(dome_file)
     dome_file.close()
 
