@@ -53,7 +53,7 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
         agency = transit_data.agencies[agency_id]
         new_transit_data.add_agency_object(agency, recursive=False)
         for line in transit_data.agencies[agency_id].lines:
-            if line.line_number in line_numbers:
+            if line_numbers is None or line.line_number in line_numbers:
                 for route in line.routes.itervalues():
                     new_transit_data.add_route_object(route, recursive=False)
                     for trip in route.trips:

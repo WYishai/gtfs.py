@@ -51,7 +51,8 @@ class TransitData(object):
                 else:
                     self.routes._load_file(routes_file,
                                            ignore_errors=True,
-                                           filter=lambda route: route.line.line_number in partial[route.agency.id])
+                                           filter=lambda route: partial[route.agency.id] is None or
+                                                                route.line.line_number in partial[route.agency.id])
                     for agency in self.agencies:
                         agency.lines.clean()
 
