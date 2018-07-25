@@ -58,7 +58,7 @@ def create_full_transit_data():
                  test_attribute="test data 30001")
 
     td.add_trip(trip_id="1001_1", route_id="1001", service_id=2, shape_id=1, bikes_allowed=False)
-    td.add_trip(trip_id="1001_2", route_id="1001", service_id=1, shape_id=1, bikes_allowed=None)
+    td.add_trip(trip_id="1001_2", route_id="1001", service_id=1, shape_id=2, bikes_allowed=None)
     td.add_trip(trip_id="1002_1", route_id="1002", service_id=1)
     td.add_trip(trip_id="1002_2", route_id="1002", service_id=3)
     td.add_trip(trip_id="1002_3", route_id="1002", service_id=4)
