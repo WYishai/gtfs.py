@@ -9,7 +9,7 @@ import psutil
 
 from gtfspy.transit_data_object import TransitData
 
-DEFAULT_GTFS_FILE_PATH = os.path.join("..", "tests", "resources", "test_gtfs.zip")
+DEFAULT_GTFS_FILE_PATH = os.path.join("..", "tests", "resources", "minimized_real_gtfs.zip")
 
 
 def pretty_size(bytes_num):

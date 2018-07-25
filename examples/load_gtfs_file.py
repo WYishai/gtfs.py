@@ -3,7 +3,7 @@ import os
 
 from gtfspy import TransitData
 
-DEFAULT_GTFS_FILE_PATH = os.path.join("..", "tests", "resources", "test_gtfs.zip")
+DEFAULT_GTFS_FILE_PATH = os.path.join("..", "tests", "resources", "minimized_real_gtfs.zip")
 
 
 def load_gtfs(gtfs_file_path):
