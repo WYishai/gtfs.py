@@ -4,6 +4,7 @@ import unittest
 
 import constants
 from gtfspy import TransitData
+from test_utils.create_gtfs_object import create_full_transit_data
 from test_utils.gtfs_utils import compare_gtfs_files
 
 
