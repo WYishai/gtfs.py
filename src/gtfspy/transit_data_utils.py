@@ -58,7 +58,8 @@ def create_partial_transit_data(transit_data, lines, add_unknown_files=True):
                     new_transit_data.add_route_object(route, recursive=False)
                     for trip in route.trips:
                         new_transit_data.add_service_object(trip.service)
-                        new_transit_data.add_shape_object(trip.shape)
+                        if trip.shape is not None:
+                            new_transit_data.add_shape_object(trip.shape)
                         new_transit_data.add_trip_object(trip)
                         for stop_time in trip.stop_times:
                             stop = stop_time.stop
