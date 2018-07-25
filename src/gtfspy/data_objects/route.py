@@ -182,7 +182,6 @@ class Route(object):
 
         assert transit_data.agencies[self.agency.id] is self.agency
         assert self.route_type in xrange(0, 8)
-        assert validate_yes_no_unknown(self.attributes.get("bikes_allowed", None))
 
     def __eq__(self, other):
         if not isinstance(other, Route):
