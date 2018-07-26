@@ -285,10 +285,10 @@ class TripCollection(BaseGtfsObjectCollection):
 
         if trip.id not in self._transit_data.trips:
             if recursive:
-                self._transit_data.add_object(trip.route, recursive=True)
-                self._transit_data.add_object(trip.service, recursive=True)
+                self._transit_data.routes.add_object(trip.route, recursive=True)
+                self._transit_data.calendar.add_object(trip.service, recursive=True)
                 if trip.shape is not None:
-                    self._transit_data.add_object(trip.shape, recursive=True)
+                    self._transit_data.shapes.add_object(trip.shape, recursive=True)
             else:
                 assert trip.route in self._transit_data.routes
                 assert trip.service in self._transit_data.calendar

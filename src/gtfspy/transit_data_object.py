@@ -183,41 +183,27 @@ class TransitData(object):
             if os.path.exists(temp_gtfs_file_path) and not os.path.isdir(temp_gtfs_file_path):
                 os.remove(temp_gtfs_file_path)
 
-    def add_agency(self, **kwargs):
-        return self.agencies.add(**kwargs)
-
-    def add_agency_object(self, agency, recursive=False):
-        return self.agencies.add_object(agency, recursive=recursive)
-
-    def add_route(self, **kwargs):
-        return self.routes.add(**kwargs)
-
-    def add_route_object(self, route, recursive=False):
-        return self.routes.add_object(route, recursive=recursive)
-
-    def add_shape_point(self, **kwargs):
-        return self.shapes.add(**kwargs)
-
-    def add_shape_object(self, shape, recursive=False):
-        return self.shapes.add_object(shape, recursive=recursive)
-
-    def add_service(self, **kwargs):
-        return self.calendar.add(**kwargs)
-
-    def add_service_object(self, service, recursive=False):
-        return self.calendar.add_object(service, recursive=recursive)
-
-    def add_trip(self, **kwargs):
-        return self.trips.add(**kwargs)
-
-    def add_trip_object(self, trip, recursive=False):
-        return self.trips.add_object(trip, recursive=recursive)
-
-    def add_stop(self, **kwargs):
-        return self.stops.add(**kwargs)
-
-    def add_stop_object(self, stop, recursive=False):
-        return self.stops.add_object(stop, recursive=recursive)
+    def add_object(self, obj, recursive=False):
+        if isinstance(obj, Agency):
+            self.agencies.add_object(obj, recursive=recursive)
+        elif isinstance(obj, FareAttribute):
+            self.fare_attributes.add_object(obj, recursive=recursive)
+        elif isinstance(obj, FareRule):
+            self.fare_rules.add_object(obj, recursive=recursive)
+        elif isinstance(obj, Route):
+            self.routes.add_object(obj, recursive=recursive)
+        elif isinstance(obj, Service):
+            self.calendar.add_object(obj, recursive=recursive)
+        elif isinstance(obj, Shape):
+            self.shapes.add_object(obj, recursive=recursive)
+        elif isinstance(obj, Stop):
+            self.stops.add_object(obj, recursive=recursive)
+        elif isinstance(obj, StopTime):
+            self.add_stop_time_object(obj, recursive=recursive)
+        elif isinstance(obj, Trip):
+            self.trips.add_object(obj, recursive=recursive)
+        else:
+            raise ValueError("Unknown object type '%s'" % (type(obj),))
 
     def add_stop_time(self, **kwargs):
         stop_time = StopTime(transit_data=self, **kwargs)
@@ -232,24 +218,12 @@ class TransitData(object):
         assert isinstance(stop_time, StopTime)
 
         if recursive:
-            self.add_trip_object(stop_time.trip, recursive=True)
-            self.add_stop_object(stop_time.stop, recursive=True)
+            self.trips.add_object(stop_time.trip, recursive=True)
+            self.stops.add_object(stop_time.stop, recursive=True)
         else:
             assert stop_time.trip in self.trips
             assert stop_time.stop in self.stops
         return self.add_stop_time(**stop_time.to_csv_line())
-
-    def add_fare_attribute(self, **kwargs):
-        return self.fare_attributes.add(**kwargs)
-
-    def add_fare_attribute_object(self, fare_attribute, recursive=False):
-        return self.fare_attributes.add_object(fare_attribute, recursive=recursive)
-
-    def add_fare_rule(self, **kwargs):
-        return self.fare_rules.add(**kwargs)
-
-    def add_fare_rule_object(self, fare_rule, recursive=False):
-        return self.fare_rules.add_object(fare_rule, recursive=recursive)
 
     def clean(self):
         self.trips.clean()

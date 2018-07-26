@@ -224,7 +224,7 @@ class RouteCollection(BaseGtfsObjectCollection):
 
         if route.id not in self:
             if recursive:
-                self._transit_data.add_object(route.agency, recursive=True)
+                self._transit_data.agencies.add_object(route.agency, recursive=True)
             else:
                 assert route.agency in self._transit_data.agencies
             return self.add(**route.to_csv_line())
