@@ -1,4 +1,12 @@
+import os
+
 from setuptools import setup, find_packages
+
+with open(os.path.join("..", "README.md"), "rb") as readme_file:
+    long_description = readme_file.read()
+    long_description = long_description \
+        .replace("](examples)", "](https://github.com/WYishai/gtfs.py/blob/master/examples)") \
+        .replace("](LICENSE)", "](https://github.com/WYishai/gtfs.py/blob/master/LICENSE)")
 
 setup(
     name="gtfs.py",
@@ -8,9 +16,19 @@ setup(
     author="Yishai Wiesner",
     author_email="wyishai AT gmail DOT com",
     description="A simple python library for parsing, editing and writing GTFS files",
-    install_requires=['sortedcontainers'],
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    install_requires=["sortedcontainers"],
     url="https://github.com/WYishai/gtfs.py",
     classifiers=[
-        "Programming Language :: Python :: 2.7"
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Other Audience",
+        "License :: OSI Approved :: Apache Software License",
+        "Operation System :: OS Independent",
+        "Programming Language :: Python :: 2.7",
+        "Topic :: Scientific/Engineering :: GIS",
+        "Topic :: Software Development :: Libraries :: Python Modules"
     ],
 )
