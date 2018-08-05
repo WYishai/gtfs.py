@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
 
     author="Yishai Wiesner",
-    author_email="wyishai AT gmail DOT com",
+    author_email="wyishai@gmail.com",
     description="A simple python library for parsing, editing and writing GTFS files",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -26,7 +26,7 @@ setup(
         "Intended Audience :: Information Technology",
         "Intended Audience :: Other Audience",
         "License :: OSI Approved :: Apache Software License",
-        "Operation System :: OS Independent",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
         "Topic :: Scientific/Engineering :: GIS",
         "Topic :: Software Development :: Libraries :: Python Modules"
