@@ -44,7 +44,7 @@ td = TransitData(gtfs_file_path)
 ...
 ```
 
-Additional examples are in the [examples folder](https://github.com/WYishai/gtfs.py/tree/master/examples) in the [GIT repository](https://github.com/WYishai/gtfs.py).
+Additional examples are in the [examples folder](examples) in the [GIT repository](https://github.com/WYishai/gtfs.py).
 
 ## Running the tests
 
