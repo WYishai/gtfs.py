@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup, find_packages
 
-with open(os.path.join("..", "README.md"), "rb") as readme_file:
+with open(os.path.join("..", "README.md"), "r") as readme_file:
     long_description = readme_file.read()
     long_description = long_description \
         .replace("](examples)", "](https://github.com/WYishai/gtfs.py/blob/master/examples)") \
